@@ -1,0 +1,23 @@
+{
+  "name": "showgrabber",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^14.0.22",
+    "eslint": "^7.4.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.2"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "typescript": "^3.9.6"
+  },
+  "scripts": {
+    "develop": "go run src/backend/server.go",
+    "gen:graphql": "go run github.com/99designs/gqlgen generate"
+  }
+}

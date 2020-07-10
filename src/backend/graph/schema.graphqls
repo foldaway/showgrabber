@@ -1,0 +1,14 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Series {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  series: [Series]!
+  seriesSearchTVDB: [Series]!
+}
+
