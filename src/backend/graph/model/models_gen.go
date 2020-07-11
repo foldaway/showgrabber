@@ -2,10 +2,17 @@
 
 package model
 
+import (
+	"github.com/bottleneckco/showgrabber/src/backend/model"
+)
+
 type SeriesAddInput struct {
-	Test string `json:"test"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
+	Banner string `json:"banner"`
 }
 
 type SeriesAddPayload struct {
-	Ok bool `json:"ok"`
+	Ok     bool          `json:"ok"`
+	Series *model.Series `json:"series"`
 }

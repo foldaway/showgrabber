@@ -5,7 +5,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"strconv"
 
@@ -15,7 +14,7 @@ import (
 )
 
 func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return strconv.Itoa(int(obj.ID)), nil
 }
 
 func (r *tVDBEpisodeResolver) SiteRating(ctx context.Context, obj *tvdb.Episode) (float64, error) {

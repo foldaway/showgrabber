@@ -5,14 +5,27 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
 )
 
 func (r *mutationResolver) SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error) {
-	panic(fmt.Errorf("not implemented"))
+	var result model.SeriesAddPayload
+
+	var series = model.Series{
+		Name:   input.Name,
+		Status: input.Status,
+		Banner: input.Banner,
+	}
+
+	var err = db.DB.Create(&series).Error
+
+	result.Ok = err == nil
+	result.Series = &series
+
+	return &result, err
 }
 
 // Mutation returns generated.MutationResolver implementation.
