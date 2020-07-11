@@ -7,6 +7,15 @@ type Series {
   name: String!
 }
 
+
+
+type TVDBSeriesSummary {
+  airedEpisodes: String!
+  airedSeasons: [String]!
+  dvdEpisodes: String!
+  dvdSeasons: [String]!
+}
+
 type TVDBSeries {
   added: String!
   addedBy: Int!
@@ -30,6 +39,8 @@ type TVDBSeries {
   siteRatingCount: Int!
   status: String!
   zap2itId: String!
+
+  summary: TVDBSeriesSummary!
 }
 
 type Query {

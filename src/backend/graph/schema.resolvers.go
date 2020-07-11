@@ -36,6 +36,15 @@ func (r *tVDBSeriesResolver) SiteRating(ctx context.Context, obj *tvdb.Series) (
 	return float64(obj.SiteRating), nil
 }
 
+func (r *tVDBSeriesResolver) Summary(ctx context.Context, obj *tvdb.Series) (*tvdb.Summary, error) {
+	err := tvdbClient.GetSeriesSummary(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	return &obj.Summary, nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
