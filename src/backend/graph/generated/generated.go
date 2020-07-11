@@ -37,6 +37,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Query() QueryResolver
+	TVDBEpisode() TVDBEpisodeResolver
 	TVDBSeries() TVDBSeriesResolver
 }
 
@@ -54,6 +55,40 @@ type ComplexityRoot struct {
 		Name func(childComplexity int) int
 	}
 
+	TVDBEpisode struct {
+		AbsoluteNumber     func(childComplexity int) int
+		AiredEpisodeNumber func(childComplexity int) int
+		AiredSeason        func(childComplexity int) int
+		AirsAfterSeason    func(childComplexity int) int
+		AirsBeforeEpisode  func(childComplexity int) int
+		AirsBeforeSeason   func(childComplexity int) int
+		Director           func(childComplexity int) int
+		Directors          func(childComplexity int) int
+		DvdChapter         func(childComplexity int) int
+		DvdDiscid          func(childComplexity int) int
+		DvdEpisodeNumber   func(childComplexity int) int
+		DvdSeason          func(childComplexity int) int
+		EpisodeName        func(childComplexity int) int
+		Filename           func(childComplexity int) int
+		FirstAired         func(childComplexity int) int
+		GuestStars         func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		ImdbID             func(childComplexity int) int
+		LastUpdated        func(childComplexity int) int
+		LastUpdatedBy      func(childComplexity int) int
+		Overview           func(childComplexity int) int
+		ProductionCode     func(childComplexity int) int
+		SeriesID           func(childComplexity int) int
+		ShowURL            func(childComplexity int) int
+		SiteRating         func(childComplexity int) int
+		SiteRatingCount    func(childComplexity int) int
+		ThumbAdded         func(childComplexity int) int
+		ThumbAuthor        func(childComplexity int) int
+		ThumbHeight        func(childComplexity int) int
+		ThumbWidth         func(childComplexity int) int
+		Writers            func(childComplexity int) int
+	}
+
 	TVDBSeries struct {
 		Added           func(childComplexity int) int
 		AddedBy         func(childComplexity int) int
@@ -61,6 +96,7 @@ type ComplexityRoot struct {
 		AirsTime        func(childComplexity int) int
 		Aliases         func(childComplexity int) int
 		Banner          func(childComplexity int) int
+		Episodes        func(childComplexity int, season int) int
 		FirstAired      func(childComplexity int) int
 		Genre           func(childComplexity int) int
 		ID              func(childComplexity int) int
@@ -92,10 +128,14 @@ type QueryResolver interface {
 	Series(ctx context.Context) ([]*model.Series, error)
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
 }
+type TVDBEpisodeResolver interface {
+	SiteRating(ctx context.Context, obj *tvdb.Episode) (float64, error)
+}
 type TVDBSeriesResolver interface {
 	SiteRating(ctx context.Context, obj *tvdb.Series) (float64, error)
 
 	Summary(ctx context.Context, obj *tvdb.Series) (*tvdb.Summary, error)
+	Episodes(ctx context.Context, obj *tvdb.Series, season int) ([]*tvdb.Episode, error)
 }
 
 type executableSchema struct {
@@ -146,6 +186,223 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Series.Name(childComplexity), true
 
+	case "TVDBEpisode.absoluteNumber":
+		if e.complexity.TVDBEpisode.AbsoluteNumber == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.AbsoluteNumber(childComplexity), true
+
+	case "TVDBEpisode.airedEpisodeNumber":
+		if e.complexity.TVDBEpisode.AiredEpisodeNumber == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.AiredEpisodeNumber(childComplexity), true
+
+	case "TVDBEpisode.airedSeason":
+		if e.complexity.TVDBEpisode.AiredSeason == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.AiredSeason(childComplexity), true
+
+	case "TVDBEpisode.airsAfterSeason":
+		if e.complexity.TVDBEpisode.AirsAfterSeason == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.AirsAfterSeason(childComplexity), true
+
+	case "TVDBEpisode.airsBeforeEpisode":
+		if e.complexity.TVDBEpisode.AirsBeforeEpisode == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.AirsBeforeEpisode(childComplexity), true
+
+	case "TVDBEpisode.airsBeforeSeason":
+		if e.complexity.TVDBEpisode.AirsBeforeSeason == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.AirsBeforeSeason(childComplexity), true
+
+	case "TVDBEpisode.director":
+		if e.complexity.TVDBEpisode.Director == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.Director(childComplexity), true
+
+	case "TVDBEpisode.directors":
+		if e.complexity.TVDBEpisode.Directors == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.Directors(childComplexity), true
+
+	case "TVDBEpisode.dvdChapter":
+		if e.complexity.TVDBEpisode.DvdChapter == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.DvdChapter(childComplexity), true
+
+	case "TVDBEpisode.dvdDiscid":
+		if e.complexity.TVDBEpisode.DvdDiscid == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.DvdDiscid(childComplexity), true
+
+	case "TVDBEpisode.dvdEpisodeNumber":
+		if e.complexity.TVDBEpisode.DvdEpisodeNumber == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.DvdEpisodeNumber(childComplexity), true
+
+	case "TVDBEpisode.dvdSeason":
+		if e.complexity.TVDBEpisode.DvdSeason == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.DvdSeason(childComplexity), true
+
+	case "TVDBEpisode.episodeName":
+		if e.complexity.TVDBEpisode.EpisodeName == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.EpisodeName(childComplexity), true
+
+	case "TVDBEpisode.filename":
+		if e.complexity.TVDBEpisode.Filename == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.Filename(childComplexity), true
+
+	case "TVDBEpisode.firstAired":
+		if e.complexity.TVDBEpisode.FirstAired == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.FirstAired(childComplexity), true
+
+	case "TVDBEpisode.guestStars":
+		if e.complexity.TVDBEpisode.GuestStars == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.GuestStars(childComplexity), true
+
+	case "TVDBEpisode.id":
+		if e.complexity.TVDBEpisode.ID == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ID(childComplexity), true
+
+	case "TVDBEpisode.imdbId":
+		if e.complexity.TVDBEpisode.ImdbID == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ImdbID(childComplexity), true
+
+	case "TVDBEpisode.lastUpdated":
+		if e.complexity.TVDBEpisode.LastUpdated == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.LastUpdated(childComplexity), true
+
+	case "TVDBEpisode.lastUpdatedBy":
+		if e.complexity.TVDBEpisode.LastUpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.LastUpdatedBy(childComplexity), true
+
+	case "TVDBEpisode.overview":
+		if e.complexity.TVDBEpisode.Overview == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.Overview(childComplexity), true
+
+	case "TVDBEpisode.productionCode":
+		if e.complexity.TVDBEpisode.ProductionCode == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ProductionCode(childComplexity), true
+
+	case "TVDBEpisode.seriesId":
+		if e.complexity.TVDBEpisode.SeriesID == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.SeriesID(childComplexity), true
+
+	case "TVDBEpisode.showURL":
+		if e.complexity.TVDBEpisode.ShowURL == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ShowURL(childComplexity), true
+
+	case "TVDBEpisode.siteRating":
+		if e.complexity.TVDBEpisode.SiteRating == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.SiteRating(childComplexity), true
+
+	case "TVDBEpisode.siteRatingCount":
+		if e.complexity.TVDBEpisode.SiteRatingCount == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.SiteRatingCount(childComplexity), true
+
+	case "TVDBEpisode.thumbAdded":
+		if e.complexity.TVDBEpisode.ThumbAdded == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ThumbAdded(childComplexity), true
+
+	case "TVDBEpisode.thumbAuthor":
+		if e.complexity.TVDBEpisode.ThumbAuthor == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ThumbAuthor(childComplexity), true
+
+	case "TVDBEpisode.thumbHeight":
+		if e.complexity.TVDBEpisode.ThumbHeight == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ThumbHeight(childComplexity), true
+
+	case "TVDBEpisode.thumbWidth":
+		if e.complexity.TVDBEpisode.ThumbWidth == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.ThumbWidth(childComplexity), true
+
+	case "TVDBEpisode.writers":
+		if e.complexity.TVDBEpisode.Writers == nil {
+			break
+		}
+
+		return e.complexity.TVDBEpisode.Writers(childComplexity), true
+
 	case "TVDBSeries.added":
 		if e.complexity.TVDBSeries.Added == nil {
 			break
@@ -187,6 +444,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TVDBSeries.Banner(childComplexity), true
+
+	case "TVDBSeries.episodes":
+		if e.complexity.TVDBSeries.Episodes == nil {
+			break
+		}
+
+		args, err := ec.field_TVDBSeries_episodes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TVDBSeries.Episodes(childComplexity, args["season"].(int)), true
 
 	case "TVDBSeries.firstAired":
 		if e.complexity.TVDBSeries.FirstAired == nil {
@@ -394,7 +663,39 @@ type Series {
   name: String!
 }
 
-
+type TVDBEpisode {
+  absoluteNumber: Int!
+  airedEpisodeNumber: Int!
+  airedSeason: Int!
+  airsAfterSeason: Int!
+  airsBeforeEpisode: Int!
+  airsBeforeSeason: Int!
+  director: String!
+  directors: [String]!
+  dvdChapter: Int!
+  dvdDiscid: String!
+  dvdEpisodeNumber: Float!
+  dvdSeason: Int!
+  episodeName: String!
+  filename: String!
+  firstAired: String!
+  guestStars: [String]!
+  id: Int!
+  imdbId: String!
+  lastUpdated: Int!
+  lastUpdatedBy: Int!
+  overview: String!
+  productionCode: String!
+  seriesId: Int!
+  showURL: String!
+  siteRating: Float!
+  siteRatingCount: Int!
+  thumbAdded: String!
+  thumbAuthor: Int!
+  thumbHeight: String!
+  thumbWidth: String!
+  writers: [String]!
+}
 
 type TVDBSeriesSummary {
   airedEpisodes: String!
@@ -428,6 +729,7 @@ type TVDBSeries {
   zap2itId: String!
 
   summary: TVDBSeriesSummary!
+  episodes(season: Int!): [TVDBEpisode]!
 }
 
 type Query {
@@ -468,6 +770,20 @@ func (ec *executionContext) field_Query_tvdbSeriesSearch_args(ctx context.Contex
 		}
 	}
 	args["term"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_TVDBSeries_episodes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["season"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["season"] = arg0
 	return args, nil
 }
 
@@ -717,6 +1033,1060 @@ func (ec *executionContext) _Series_name(ctx context.Context, field graphql.Coll
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_absoluteNumber(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AbsoluteNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_airedEpisodeNumber(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AiredEpisodeNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_airedSeason(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AiredSeason, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_airsAfterSeason(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AirsAfterSeason, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_airsBeforeEpisode(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AirsBeforeEpisode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_airsBeforeSeason(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AirsBeforeSeason, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_director(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Director, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_directors(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Directors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_dvdChapter(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DvdChapter, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_dvdDiscid(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DvdDiscid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_dvdEpisodeNumber(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DvdEpisodeNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_dvdSeason(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DvdSeason, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_episodeName(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EpisodeName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_filename(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Filename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_firstAired(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirstAired, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_guestStars(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GuestStars, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_id(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_imdbId(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImdbID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_lastUpdated(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastUpdated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_lastUpdatedBy(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastUpdatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_overview(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Overview, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_productionCode(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProductionCode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_seriesId(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeriesID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_showURL(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShowURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_siteRating(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.TVDBEpisode().SiteRating(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_siteRatingCount(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SiteRatingCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_thumbAdded(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ThumbAdded, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_thumbAuthor(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ThumbAuthor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_thumbHeight(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ThumbHeight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_thumbWidth(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ThumbWidth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBEpisode_writers(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBEpisode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Writers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TVDBSeries_added(ctx context.Context, field graphql.CollectedField, obj *tvdb.Series) (ret graphql.Marshaler) {
@@ -1496,6 +2866,47 @@ func (ec *executionContext) _TVDBSeries_summary(ctx context.Context, field graph
 	res := resTmp.(*tvdb.Summary)
 	fc.Result = res
 	return ec.marshalNTVDBSeriesSummary2ᚖgithubᚗcomᚋpiozᚋtvdbᚐSummary(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TVDBSeries_episodes(ctx context.Context, field graphql.CollectedField, obj *tvdb.Series) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TVDBSeries",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_TVDBSeries_episodes_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.TVDBSeries().Episodes(rctx, obj, args["season"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*tvdb.Episode)
+	fc.Result = res
+	return ec.marshalNTVDBEpisode2ᚕᚖgithubᚗcomᚋpiozᚋtvdbᚐEpisode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TVDBSeriesSummary_airedEpisodes(ctx context.Context, field graphql.CollectedField, obj *tvdb.Summary) (ret graphql.Marshaler) {
@@ -2787,6 +4198,192 @@ func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var tVDBEpisodeImplementors = []string{"TVDBEpisode"}
+
+func (ec *executionContext) _TVDBEpisode(ctx context.Context, sel ast.SelectionSet, obj *tvdb.Episode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tVDBEpisodeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TVDBEpisode")
+		case "absoluteNumber":
+			out.Values[i] = ec._TVDBEpisode_absoluteNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "airedEpisodeNumber":
+			out.Values[i] = ec._TVDBEpisode_airedEpisodeNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "airedSeason":
+			out.Values[i] = ec._TVDBEpisode_airedSeason(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "airsAfterSeason":
+			out.Values[i] = ec._TVDBEpisode_airsAfterSeason(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "airsBeforeEpisode":
+			out.Values[i] = ec._TVDBEpisode_airsBeforeEpisode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "airsBeforeSeason":
+			out.Values[i] = ec._TVDBEpisode_airsBeforeSeason(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "director":
+			out.Values[i] = ec._TVDBEpisode_director(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "directors":
+			out.Values[i] = ec._TVDBEpisode_directors(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "dvdChapter":
+			out.Values[i] = ec._TVDBEpisode_dvdChapter(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "dvdDiscid":
+			out.Values[i] = ec._TVDBEpisode_dvdDiscid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "dvdEpisodeNumber":
+			out.Values[i] = ec._TVDBEpisode_dvdEpisodeNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "dvdSeason":
+			out.Values[i] = ec._TVDBEpisode_dvdSeason(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "episodeName":
+			out.Values[i] = ec._TVDBEpisode_episodeName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "filename":
+			out.Values[i] = ec._TVDBEpisode_filename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "firstAired":
+			out.Values[i] = ec._TVDBEpisode_firstAired(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "guestStars":
+			out.Values[i] = ec._TVDBEpisode_guestStars(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "id":
+			out.Values[i] = ec._TVDBEpisode_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "imdbId":
+			out.Values[i] = ec._TVDBEpisode_imdbId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "lastUpdated":
+			out.Values[i] = ec._TVDBEpisode_lastUpdated(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "lastUpdatedBy":
+			out.Values[i] = ec._TVDBEpisode_lastUpdatedBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "overview":
+			out.Values[i] = ec._TVDBEpisode_overview(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "productionCode":
+			out.Values[i] = ec._TVDBEpisode_productionCode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "seriesId":
+			out.Values[i] = ec._TVDBEpisode_seriesId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "showURL":
+			out.Values[i] = ec._TVDBEpisode_showURL(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "siteRating":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TVDBEpisode_siteRating(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "siteRatingCount":
+			out.Values[i] = ec._TVDBEpisode_siteRatingCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "thumbAdded":
+			out.Values[i] = ec._TVDBEpisode_thumbAdded(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "thumbAuthor":
+			out.Values[i] = ec._TVDBEpisode_thumbAuthor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "thumbHeight":
+			out.Values[i] = ec._TVDBEpisode_thumbHeight(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "thumbWidth":
+			out.Values[i] = ec._TVDBEpisode_thumbWidth(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "writers":
+			out.Values[i] = ec._TVDBEpisode_writers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var tVDBSeriesImplementors = []string{"TVDBSeries"}
 
 func (ec *executionContext) _TVDBSeries(ctx context.Context, sel ast.SelectionSet, obj *tvdb.Series) graphql.Marshaler {
@@ -2923,6 +4520,20 @@ func (ec *executionContext) _TVDBSeries(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._TVDBSeries_summary(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "episodes":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TVDBSeries_episodes(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3376,6 +4987,43 @@ func (ec *executionContext) marshalNString2ᚕstring(ctx context.Context, sel as
 	return ret
 }
 
+func (ec *executionContext) marshalNTVDBEpisode2ᚕᚖgithubᚗcomᚋpiozᚋtvdbᚐEpisode(ctx context.Context, sel ast.SelectionSet, v []*tvdb.Episode) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTVDBEpisode2ᚖgithubᚗcomᚋpiozᚋtvdbᚐEpisode(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNTVDBSeries2ᚕᚖgithubᚗcomᚋpiozᚋtvdbᚐSeries(ctx context.Context, sel ast.SelectionSet, v []*tvdb.Series) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -3740,6 +5388,17 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOString2string(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOTVDBEpisode2githubᚗcomᚋpiozᚋtvdbᚐEpisode(ctx context.Context, sel ast.SelectionSet, v tvdb.Episode) graphql.Marshaler {
+	return ec._TVDBEpisode(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOTVDBEpisode2ᚖgithubᚗcomᚋpiozᚋtvdbᚐEpisode(ctx context.Context, sel ast.SelectionSet, v *tvdb.Episode) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TVDBEpisode(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOTVDBSeries2githubᚗcomᚋpiozᚋtvdbᚐSeries(ctx context.Context, sel ast.SelectionSet, v tvdb.Series) graphql.Marshaler {

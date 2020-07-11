@@ -58,3 +58,5 @@ models:
     fields:
       summary:
         resolver: true
+      episodes:
+        resolver: true

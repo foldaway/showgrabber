@@ -7,7 +7,39 @@ type Series {
   name: String!
 }
 
-
+type TVDBEpisode {
+  absoluteNumber: Int!
+  airedEpisodeNumber: Int!
+  airedSeason: Int!
+  airsAfterSeason: Int!
+  airsBeforeEpisode: Int!
+  airsBeforeSeason: Int!
+  director: String!
+  directors: [String]!
+  dvdChapter: Int!
+  dvdDiscid: String!
+  dvdEpisodeNumber: Float!
+  dvdSeason: Int!
+  episodeName: String!
+  filename: String!
+  firstAired: String!
+  guestStars: [String]!
+  id: Int!
+  imdbId: String!
+  lastUpdated: Int!
+  lastUpdatedBy: Int!
+  overview: String!
+  productionCode: String!
+  seriesId: Int!
+  showURL: String!
+  siteRating: Float!
+  siteRatingCount: Int!
+  thumbAdded: String!
+  thumbAuthor: Int!
+  thumbHeight: String!
+  thumbWidth: String!
+  writers: [String]!
+}
 
 type TVDBSeriesSummary {
   airedEpisodes: String!
@@ -41,6 +73,7 @@ type TVDBSeries {
   zap2itId: String!
 
   summary: TVDBSeriesSummary!
+  episodes(season: Int!): [TVDBEpisode]!
 }
 
 type Query {
