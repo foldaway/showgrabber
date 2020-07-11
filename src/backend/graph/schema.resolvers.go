@@ -5,17 +5,20 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"strconv"
 
+	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
+	mainModel "github.com/bottleneckco/showgrabber/src/backend/model"
 	"github.com/pioz/tvdb"
 )
 
 func (r *queryResolver) Series(ctx context.Context) ([]*model.Series, error) {
-	panic(fmt.Errorf("not implemented"))
+	var results []*model.Series
+	var err = db.DB.Model(&mainModel.Series{}).Find(&results).Error
+	return results, err
 }
 
 func (r *queryResolver) TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error) {
