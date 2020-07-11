@@ -7,8 +7,33 @@ type Series {
   name: String!
 }
 
+type TVDBSeries {
+  added: String!
+  addedBy: Int!
+  airsDayOfWeek: String!
+  airsTime: String!
+  aliases: [String]!
+  banner: String!
+  firstAired: String!
+  genre: [String]
+  id: ID!
+  imdbId: String!
+  lastUpdated: Int!
+  network: String!
+  networkID: String!
+  overview: String!
+  rating: String!
+  runtime: String!
+  seriesId: String!
+  seriesName: String!
+  siteRating: Float!
+  siteRatingCount: Int!
+  status: String!
+  zap2itId: String!
+}
+
 type Query {
   series: [Series]!
-  seriesSearchTVDB: [Series]!
+  tvdbSeriesSearch(term: String!): [TVDBSeries]!
 }
 
