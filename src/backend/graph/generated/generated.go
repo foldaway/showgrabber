@@ -13,6 +13,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
+	model1 "github.com/bottleneckco/showgrabber/src/backend/model"
 	"github.com/pioz/tvdb"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -36,7 +37,9 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
+	Series() SeriesResolver
 	TVDBEpisode() TVDBEpisodeResolver
 	TVDBSeries() TVDBSeriesResolver
 }
@@ -45,6 +48,10 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Mutation struct {
+		SeriesAdd func(childComplexity int, input model.SeriesAddInput) int
+	}
+
 	Query struct {
 		Series           func(childComplexity int) int
 		TvdbSeriesSearch func(childComplexity int, term string) int
@@ -53,6 +60,10 @@ type ComplexityRoot struct {
 	Series struct {
 		ID   func(childComplexity int) int
 		Name func(childComplexity int) int
+	}
+
+	SeriesAddPayload struct {
+		Ok func(childComplexity int) int
 	}
 
 	TVDBEpisode struct {
@@ -124,9 +135,15 @@ type ComplexityRoot struct {
 	}
 }
 
+type MutationResolver interface {
+	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
+}
 type QueryResolver interface {
-	Series(ctx context.Context) ([]*model.Series, error)
+	Series(ctx context.Context) ([]*model1.Series, error)
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
+}
+type SeriesResolver interface {
+	ID(ctx context.Context, obj *model1.Series) (string, error)
 }
 type TVDBEpisodeResolver interface {
 	SiteRating(ctx context.Context, obj *tvdb.Episode) (float64, error)
@@ -152,6 +169,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Mutation.seriesAdd":
+		if e.complexity.Mutation.SeriesAdd == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_seriesAdd_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SeriesAdd(childComplexity, args["input"].(model.SeriesAddInput)), true
 
 	case "Query.series":
 		if e.complexity.Query.Series == nil {
@@ -185,6 +214,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Series.Name(childComplexity), true
+
+	case "SeriesAddPayload.ok":
+		if e.complexity.SeriesAddPayload.Ok == nil {
+			break
+		}
+
+		return e.complexity.SeriesAddPayload.Ok(childComplexity), true
 
 	case "TVDBEpisode.absoluteNumber":
 		if e.complexity.TVDBEpisode.AbsoluteNumber == nil {
@@ -628,6 +664,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -654,7 +704,25 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "src/backend/graph/schema.graphqls", Input: `# GraphQL schema example
+	&ast.Source{Name: "src/backend/graph/schema/mutations.graphqls", Input: `# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Mutation {
+  seriesAdd(input: SeriesAddInput!): SeriesAddPayload!
+}
+`, BuiltIn: false},
+	&ast.Source{Name: "src/backend/graph/schema/queries.graphqls", Input: `# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Query {
+  series: [Series]!
+  tvdbSeriesSearch(term: String!): [TVDBSeries]!
+}
+
+`, BuiltIn: false},
+	&ast.Source{Name: "src/backend/graph/schema/schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
 
@@ -732,11 +800,13 @@ type TVDBSeries {
   episodes(season: Int!): [TVDBEpisode]!
 }
 
-type Query {
-  series: [Series]!
-  tvdbSeriesSearch(term: String!): [TVDBSeries]!
+input SeriesAddInput {
+  test: String!
 }
 
+type SeriesAddPayload {
+  ok: Boolean!
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -744,6 +814,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_seriesAdd_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.SeriesAddInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNSeriesAddInput2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -823,6 +907,47 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _Mutation_seriesAdd(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_seriesAdd_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SeriesAdd(rctx, args["input"].(model.SeriesAddInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SeriesAddPayload)
+	fc.Result = res
+	return ec.marshalNSeriesAddPayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddPayload(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_series(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -852,9 +977,9 @@ func (ec *executionContext) _Query_series(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Series)
+	res := resTmp.([]*model1.Series)
 	fc.Result = res
-	return ec.marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeries(ctx, field.Selections, res)
+	return ec.marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_tvdbSeriesSearch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -967,7 +1092,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Series_id(ctx context.Context, field graphql.CollectedField, obj *model.Series) (ret graphql.Marshaler) {
+func (ec *executionContext) _Series_id(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -978,13 +1103,13 @@ func (ec *executionContext) _Series_id(ctx context.Context, field graphql.Collec
 		Object:   "Series",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Series().ID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1001,7 +1126,7 @@ func (ec *executionContext) _Series_id(ctx context.Context, field graphql.Collec
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Series_name(ctx context.Context, field graphql.CollectedField, obj *model.Series) (ret graphql.Marshaler) {
+func (ec *executionContext) _Series_name(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1033,6 +1158,40 @@ func (ec *executionContext) _Series_name(ctx context.Context, field graphql.Coll
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SeriesAddPayload_ok(ctx context.Context, field graphql.CollectedField, obj *model.SeriesAddPayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SeriesAddPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ok, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TVDBEpisode_absoluteNumber(ctx context.Context, field graphql.CollectedField, obj *tvdb.Episode) (ret graphql.Marshaler) {
@@ -4100,6 +4259,24 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputSeriesAddInput(ctx context.Context, obj interface{}) (model.SeriesAddInput, error) {
+	var it model.SeriesAddInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "test":
+			var err error
+			it.Test, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -4107,6 +4284,37 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "seriesAdd":
+			out.Values[i] = ec._Mutation_seriesAdd(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
 
 var queryImplementors = []string{"Query"}
 
@@ -4168,7 +4376,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var seriesImplementors = []string{"Series"}
 
-func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, obj *model.Series) graphql.Marshaler {
+func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, obj *model1.Series) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, seriesImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -4178,12 +4386,48 @@ func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, o
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Series")
 		case "id":
-			out.Values[i] = ec._Series_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Series_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "name":
 			out.Values[i] = ec._Series_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var seriesAddPayloadImplementors = []string{"SeriesAddPayload"}
+
+func (ec *executionContext) _SeriesAddPayload(ctx context.Context, sel ast.SelectionSet, obj *model.SeriesAddPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, seriesAddPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SeriesAddPayload")
+		case "ok":
+			out.Values[i] = ec._SeriesAddPayload_ok(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4907,7 +5151,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v []*model.Series) graphql.Marshaler {
+func (ec *executionContext) marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v []*model1.Series) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4931,7 +5175,7 @@ func (ec *executionContext) marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋs
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSeries2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeries(ctx, sel, v[i])
+			ret[i] = ec.marshalOSeries2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4942,6 +5186,24 @@ func (ec *executionContext) marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋs
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) unmarshalNSeriesAddInput2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddInput(ctx context.Context, v interface{}) (model.SeriesAddInput, error) {
+	return ec.unmarshalInputSeriesAddInput(ctx, v)
+}
+
+func (ec *executionContext) marshalNSeriesAddPayload2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddPayload(ctx context.Context, sel ast.SelectionSet, v model.SeriesAddPayload) graphql.Marshaler {
+	return ec._SeriesAddPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSeriesAddPayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddPayload(ctx context.Context, sel ast.SelectionSet, v *model.SeriesAddPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SeriesAddPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -5324,11 +5586,11 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOSeries2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v model.Series) graphql.Marshaler {
+func (ec *executionContext) marshalOSeries2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v model1.Series) graphql.Marshaler {
 	return ec._Series(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOSeries2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v *model.Series) graphql.Marshaler {
+func (ec *executionContext) marshalOSeries2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v *model1.Series) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

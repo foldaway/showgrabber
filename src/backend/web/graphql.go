@@ -3,8 +3,8 @@ package web
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/bottleneckco/showgrabber/src/backend/graph"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
+	"github.com/bottleneckco/showgrabber/src/backend/graph/resolvers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +12,7 @@ var (
 	main = handler.NewDefaultServer(
 		generated.NewExecutableSchema(
 			generated.Config{
-				Resolvers: &graph.Resolver{},
+				Resolvers: &resolvers.Resolver{},
 			},
 		),
 	)
