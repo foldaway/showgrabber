@@ -5,5 +5,7 @@
 type Query {
   series: [Series]!
   tvdbSeriesSearch(term: String!): [TVDBSeries]!
+
+  nzbSearch(categories: [NewznabCategory]!, term: String!): [Newznab]!
 }
 

@@ -9,11 +9,13 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
 	model1 "github.com/bottleneckco/showgrabber/src/backend/model"
+	"github.com/mrobinsn/go-newznab/newznab"
 	"github.com/pioz/tvdb"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -38,6 +40,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Newznab() NewznabResolver
 	Query() QueryResolver
 	Series() SeriesResolver
 	TVDBEpisode() TVDBEpisodeResolver
@@ -52,7 +55,50 @@ type ComplexityRoot struct {
 		SeriesAdd func(childComplexity int, input model.SeriesAddInput) int
 	}
 
+	Newznab struct {
+		AirDate        func(childComplexity int) int
+		Category       func(childComplexity int) int
+		Comments       func(childComplexity int) int
+		CoverURL       func(childComplexity int) int
+		Description    func(childComplexity int) int
+		DownloadURL    func(childComplexity int) int
+		Episode        func(childComplexity int) int
+		Genre          func(childComplexity int) int
+		ID             func(childComplexity int) int
+		IMDBTitle      func(childComplexity int) int
+		IMDBYear       func(childComplexity int) int
+		Imdb           func(childComplexity int) int
+		Imdbscore      func(childComplexity int) int
+		Info           func(childComplexity int) int
+		InfoHash       func(childComplexity int) int
+		IsTorrent      func(childComplexity int) int
+		NumComments    func(childComplexity int) int
+		NumGrabs       func(childComplexity int) int
+		Peers          func(childComplexity int) int
+		PubDate        func(childComplexity int) int
+		Rating         func(childComplexity int) int
+		Resolution     func(childComplexity int) int
+		Season         func(childComplexity int) int
+		Seeders        func(childComplexity int) int
+		Size           func(childComplexity int) int
+		SourceAPIKey   func(childComplexity int) int
+		SourceEndpoint func(childComplexity int) int
+		TVDBID         func(childComplexity int) int
+		TVMazeID       func(childComplexity int) int
+		TVRageID       func(childComplexity int) int
+		TVTitle        func(childComplexity int) int
+		Title          func(childComplexity int) int
+		UsenetDate     func(childComplexity int) int
+	}
+
+	NewznabComment struct {
+		Content func(childComplexity int) int
+		PubDate func(childComplexity int) int
+		Title   func(childComplexity int) int
+	}
+
 	Query struct {
+		NzbSearch        func(childComplexity int, categories []*model.NewznabCategory, term string) int
 		Series           func(childComplexity int) int
 		TvdbSeriesSearch func(childComplexity int, term string) int
 	}
@@ -141,9 +187,17 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
 }
+type NewznabResolver interface {
+	Comments(ctx context.Context, obj *newznab.NZB) ([]*model.NewznabComment, error)
+
+	Imdb(ctx context.Context, obj *newznab.NZB) (*string, error)
+
+	Imdbscore(ctx context.Context, obj *newznab.NZB) (*float64, error)
+}
 type QueryResolver interface {
 	Series(ctx context.Context) ([]*model1.Series, error)
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
+	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*newznab.NZB, error)
 }
 type SeriesResolver interface {
 	ID(ctx context.Context, obj *model1.Series) (string, error)
@@ -184,6 +238,270 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SeriesAdd(childComplexity, args["input"].(model.SeriesAddInput)), true
+
+	case "Newznab.air_date":
+		if e.complexity.Newznab.AirDate == nil {
+			break
+		}
+
+		return e.complexity.Newznab.AirDate(childComplexity), true
+
+	case "Newznab.category":
+		if e.complexity.Newznab.Category == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Category(childComplexity), true
+
+	case "Newznab.comments":
+		if e.complexity.Newznab.Comments == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Comments(childComplexity), true
+
+	case "Newznab.coverurl":
+		if e.complexity.Newznab.CoverURL == nil {
+			break
+		}
+
+		return e.complexity.Newznab.CoverURL(childComplexity), true
+
+	case "Newznab.description":
+		if e.complexity.Newznab.Description == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Description(childComplexity), true
+
+	case "Newznab.download_url":
+		if e.complexity.Newznab.DownloadURL == nil {
+			break
+		}
+
+		return e.complexity.Newznab.DownloadURL(childComplexity), true
+
+	case "Newznab.episode":
+		if e.complexity.Newznab.Episode == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Episode(childComplexity), true
+
+	case "Newznab.genre":
+		if e.complexity.Newznab.Genre == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Genre(childComplexity), true
+
+	case "Newznab.id":
+		if e.complexity.Newznab.ID == nil {
+			break
+		}
+
+		return e.complexity.Newznab.ID(childComplexity), true
+
+	case "Newznab.imdbtitle":
+		if e.complexity.Newznab.IMDBTitle == nil {
+			break
+		}
+
+		return e.complexity.Newznab.IMDBTitle(childComplexity), true
+
+	case "Newznab.imdbyear":
+		if e.complexity.Newznab.IMDBYear == nil {
+			break
+		}
+
+		return e.complexity.Newznab.IMDBYear(childComplexity), true
+
+	case "Newznab.imdb":
+		if e.complexity.Newznab.Imdb == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Imdb(childComplexity), true
+
+	case "Newznab.imdbscore":
+		if e.complexity.Newznab.Imdbscore == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Imdbscore(childComplexity), true
+
+	case "Newznab.info":
+		if e.complexity.Newznab.Info == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Info(childComplexity), true
+
+	case "Newznab.infohash":
+		if e.complexity.Newznab.InfoHash == nil {
+			break
+		}
+
+		return e.complexity.Newznab.InfoHash(childComplexity), true
+
+	case "Newznab.is_torrent":
+		if e.complexity.Newznab.IsTorrent == nil {
+			break
+		}
+
+		return e.complexity.Newznab.IsTorrent(childComplexity), true
+
+	case "Newznab.num_comments":
+		if e.complexity.Newznab.NumComments == nil {
+			break
+		}
+
+		return e.complexity.Newznab.NumComments(childComplexity), true
+
+	case "Newznab.num_grabs":
+		if e.complexity.Newznab.NumGrabs == nil {
+			break
+		}
+
+		return e.complexity.Newznab.NumGrabs(childComplexity), true
+
+	case "Newznab.peers":
+		if e.complexity.Newznab.Peers == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Peers(childComplexity), true
+
+	case "Newznab.pub_date":
+		if e.complexity.Newznab.PubDate == nil {
+			break
+		}
+
+		return e.complexity.Newznab.PubDate(childComplexity), true
+
+	case "Newznab.rating":
+		if e.complexity.Newznab.Rating == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Rating(childComplexity), true
+
+	case "Newznab.resolution":
+		if e.complexity.Newznab.Resolution == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Resolution(childComplexity), true
+
+	case "Newznab.season":
+		if e.complexity.Newznab.Season == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Season(childComplexity), true
+
+	case "Newznab.seeders":
+		if e.complexity.Newznab.Seeders == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Seeders(childComplexity), true
+
+	case "Newznab.size":
+		if e.complexity.Newznab.Size == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Size(childComplexity), true
+
+	case "Newznab.source_apikey":
+		if e.complexity.Newznab.SourceAPIKey == nil {
+			break
+		}
+
+		return e.complexity.Newznab.SourceAPIKey(childComplexity), true
+
+	case "Newznab.source_endpoint":
+		if e.complexity.Newznab.SourceEndpoint == nil {
+			break
+		}
+
+		return e.complexity.Newznab.SourceEndpoint(childComplexity), true
+
+	case "Newznab.tvdbid":
+		if e.complexity.Newznab.TVDBID == nil {
+			break
+		}
+
+		return e.complexity.Newznab.TVDBID(childComplexity), true
+
+	case "Newznab.tvmazeid":
+		if e.complexity.Newznab.TVMazeID == nil {
+			break
+		}
+
+		return e.complexity.Newznab.TVMazeID(childComplexity), true
+
+	case "Newznab.tvrageid":
+		if e.complexity.Newznab.TVRageID == nil {
+			break
+		}
+
+		return e.complexity.Newznab.TVRageID(childComplexity), true
+
+	case "Newznab.tvtitle":
+		if e.complexity.Newznab.TVTitle == nil {
+			break
+		}
+
+		return e.complexity.Newznab.TVTitle(childComplexity), true
+
+	case "Newznab.title":
+		if e.complexity.Newznab.Title == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Title(childComplexity), true
+
+	case "Newznab.usenet_date":
+		if e.complexity.Newznab.UsenetDate == nil {
+			break
+		}
+
+		return e.complexity.Newznab.UsenetDate(childComplexity), true
+
+	case "NewznabComment.content":
+		if e.complexity.NewznabComment.Content == nil {
+			break
+		}
+
+		return e.complexity.NewznabComment.Content(childComplexity), true
+
+	case "NewznabComment.pub_date":
+		if e.complexity.NewznabComment.PubDate == nil {
+			break
+		}
+
+		return e.complexity.NewznabComment.PubDate(childComplexity), true
+
+	case "NewznabComment.title":
+		if e.complexity.NewznabComment.Title == nil {
+			break
+		}
+
+		return e.complexity.NewznabComment.Title(childComplexity), true
+
+	case "Query.nzbSearch":
+		if e.complexity.Query.NzbSearch == nil {
+			break
+		}
+
+		args, err := ec.field_Query_nzbSearch_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.NzbSearch(childComplexity, args["categories"].([]*model.NewznabCategory), args["term"].(string)), true
 
 	case "Query.series":
 		if e.complexity.Query.Series == nil {
@@ -736,6 +1054,76 @@ type Mutation {
   seriesAdd(input: SeriesAddInput!): SeriesAddPayload!
 }
 `, BuiltIn: false},
+	&ast.Source{Name: "src/backend/graph/schema/newznab.graphqls", Input: `# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Newznab {
+  id: ID
+  title: String
+  description: String
+  size: Int
+  air_date: Time
+  pub_date: Time
+  usenet_date: Time
+  num_grabs: Int
+  num_comments: Int
+  comments: [NewznabComment]
+
+  source_endpoint: String!
+  source_apikey: String!
+  category: [String]
+  info: String
+  genre: String
+
+  resolution: String
+
+  tvdbid: String
+  tvrageid: String
+  tvmazeid: String
+  season: String
+  episode: String
+  tvtitle: String
+  rating: Int
+
+  imdb: String
+  imdbtitle: String
+  imdbyear: Int
+  imdbscore: Float
+  coverurl: String
+
+  seeders: Int
+  peers: Int
+  infohash: String
+  download_url: String
+  is_torrent: Boolean 
+}
+
+enum NewznabCategory {
+  TV_ALL
+  TV_FOREIGN
+  TV_SD
+  TV_HD
+  TV_UHD
+  TV_OTHER
+  TV_SPORT
+
+  MOVIE_ALL
+  MOVIE_FOREIGN
+  MOVIE_OTHER
+  MOVIE_SD
+  MOVIE_HD
+  MOVIE_UHD
+  MOVIE_BLURAY
+  MOVIE_3D
+}
+
+type NewznabComment {
+  title: String
+  content: String
+  pub_date: Time
+}
+`, BuiltIn: false},
 	&ast.Source{Name: "src/backend/graph/schema/queries.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
@@ -743,8 +1131,12 @@ type Mutation {
 type Query {
   series: [Series]!
   tvdbSeriesSearch(term: String!): [TVDBSeries]!
+
+  nzbSearch(categories: [NewznabCategory]!, term: String!): [Newznab]!
 }
 
+`, BuiltIn: false},
+	&ast.Source{Name: "src/backend/graph/schema/scalars.graphqls", Input: `scalar Time
 `, BuiltIn: false},
 	&ast.Source{Name: "src/backend/graph/schema/schema.graphqls", Input: `# GraphQL schema example
 #
@@ -872,6 +1264,28 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_nzbSearch_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.NewznabCategory
+	if tmp, ok := rawArgs["categories"]; ok {
+		arg0, err = ec.unmarshalNNewznabCategory2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categories"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["term"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["term"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_tvdbSeriesSearch_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -977,6 +1391,1128 @@ func (ec *executionContext) _Mutation_seriesAdd(ctx context.Context, field graph
 	return ec.marshalNSeriesAddPayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddPayload(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_description(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_size(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Size, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalOInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_air_date(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AirDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_pub_date(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PubDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_usenet_date(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UsenetDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_num_grabs(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumGrabs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_num_comments(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumComments, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_comments(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Newznab().Comments(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.NewznabComment)
+	fc.Result = res
+	return ec.marshalONewznabComment2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_source_endpoint(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SourceEndpoint, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_source_apikey(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SourceAPIKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_category(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Category, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_info(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Info, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_genre(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Genre, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_resolution(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resolution, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_tvdbid(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TVDBID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_tvrageid(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TVRageID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_tvmazeid(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TVMazeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_season(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Season, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_episode(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Episode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_tvtitle(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TVTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_rating(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rating, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_imdb(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Newznab().Imdb(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_imdbtitle(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IMDBTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_imdbyear(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IMDBYear, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_imdbscore(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Newznab().Imdbscore(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_coverurl(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CoverURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_seeders(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Seeders, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_peers(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Peers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_infohash(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.InfoHash, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_download_url(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DownloadURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Newznab_is_torrent(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsTorrent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NewznabComment_title(ctx context.Context, field graphql.CollectedField, obj *model.NewznabComment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NewznabComment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NewznabComment_content(ctx context.Context, field graphql.CollectedField, obj *model.NewznabComment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NewznabComment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NewznabComment_pub_date(ctx context.Context, field graphql.CollectedField, obj *model.NewznabComment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NewznabComment",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PubDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_series(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1050,6 +2586,47 @@ func (ec *executionContext) _Query_tvdbSeriesSearch(ctx context.Context, field g
 	res := resTmp.([]*tvdb.Series)
 	fc.Result = res
 	return ec.marshalNTVDBSeries2ᚕᚖgithubᚗcomᚋpiozᚋtvdbᚐSeries(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_nzbSearch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_nzbSearch_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().NzbSearch(rctx, args["categories"].([]*model.NewznabCategory), args["term"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*newznab.NZB)
+	fc.Result = res
+	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4459,6 +6036,155 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var newznabImplementors = []string{"Newznab"}
+
+func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, obj *newznab.NZB) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, newznabImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Newznab")
+		case "id":
+			out.Values[i] = ec._Newznab_id(ctx, field, obj)
+		case "title":
+			out.Values[i] = ec._Newznab_title(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._Newznab_description(ctx, field, obj)
+		case "size":
+			out.Values[i] = ec._Newznab_size(ctx, field, obj)
+		case "air_date":
+			out.Values[i] = ec._Newznab_air_date(ctx, field, obj)
+		case "pub_date":
+			out.Values[i] = ec._Newznab_pub_date(ctx, field, obj)
+		case "usenet_date":
+			out.Values[i] = ec._Newznab_usenet_date(ctx, field, obj)
+		case "num_grabs":
+			out.Values[i] = ec._Newznab_num_grabs(ctx, field, obj)
+		case "num_comments":
+			out.Values[i] = ec._Newznab_num_comments(ctx, field, obj)
+		case "comments":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Newznab_comments(ctx, field, obj)
+				return res
+			})
+		case "source_endpoint":
+			out.Values[i] = ec._Newznab_source_endpoint(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "source_apikey":
+			out.Values[i] = ec._Newznab_source_apikey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "category":
+			out.Values[i] = ec._Newznab_category(ctx, field, obj)
+		case "info":
+			out.Values[i] = ec._Newznab_info(ctx, field, obj)
+		case "genre":
+			out.Values[i] = ec._Newznab_genre(ctx, field, obj)
+		case "resolution":
+			out.Values[i] = ec._Newznab_resolution(ctx, field, obj)
+		case "tvdbid":
+			out.Values[i] = ec._Newznab_tvdbid(ctx, field, obj)
+		case "tvrageid":
+			out.Values[i] = ec._Newznab_tvrageid(ctx, field, obj)
+		case "tvmazeid":
+			out.Values[i] = ec._Newznab_tvmazeid(ctx, field, obj)
+		case "season":
+			out.Values[i] = ec._Newznab_season(ctx, field, obj)
+		case "episode":
+			out.Values[i] = ec._Newznab_episode(ctx, field, obj)
+		case "tvtitle":
+			out.Values[i] = ec._Newznab_tvtitle(ctx, field, obj)
+		case "rating":
+			out.Values[i] = ec._Newznab_rating(ctx, field, obj)
+		case "imdb":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Newznab_imdb(ctx, field, obj)
+				return res
+			})
+		case "imdbtitle":
+			out.Values[i] = ec._Newznab_imdbtitle(ctx, field, obj)
+		case "imdbyear":
+			out.Values[i] = ec._Newznab_imdbyear(ctx, field, obj)
+		case "imdbscore":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Newznab_imdbscore(ctx, field, obj)
+				return res
+			})
+		case "coverurl":
+			out.Values[i] = ec._Newznab_coverurl(ctx, field, obj)
+		case "seeders":
+			out.Values[i] = ec._Newznab_seeders(ctx, field, obj)
+		case "peers":
+			out.Values[i] = ec._Newznab_peers(ctx, field, obj)
+		case "infohash":
+			out.Values[i] = ec._Newznab_infohash(ctx, field, obj)
+		case "download_url":
+			out.Values[i] = ec._Newznab_download_url(ctx, field, obj)
+		case "is_torrent":
+			out.Values[i] = ec._Newznab_is_torrent(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var newznabCommentImplementors = []string{"NewznabComment"}
+
+func (ec *executionContext) _NewznabComment(ctx context.Context, sel ast.SelectionSet, obj *model.NewznabComment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, newznabCommentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NewznabComment")
+		case "title":
+			out.Values[i] = ec._NewznabComment_title(ctx, field, obj)
+		case "content":
+			out.Values[i] = ec._NewznabComment_content(ctx, field, obj)
+		case "pub_date":
+			out.Values[i] = ec._NewznabComment_pub_date(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -4497,6 +6223,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_tvdbSeriesSearch(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "nzbSearch":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_nzbSearch(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5309,6 +7049,100 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v []*newznab.NZB) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONewznab2ᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) unmarshalNNewznabCategory2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, v interface{}) ([]*model.NewznabCategory, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.NewznabCategory, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNNewznabCategory2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, sel ast.SelectionSet, v []*model.NewznabCategory) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNSeries2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v model1.Series) graphql.Marshaler {
 	return ec._Series(ctx, sel, &v)
 }
@@ -5758,6 +7592,139 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
+func (ec *executionContext) unmarshalOFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalOFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	return graphql.MarshalFloat(v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOFloat2float64(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOFloat2float64(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOID2string(ctx context.Context, v interface{}) (string, error) {
+	return graphql.UnmarshalID(v)
+}
+
+func (ec *executionContext) marshalOID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	return graphql.MarshalID(v)
+}
+
+func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	return graphql.MarshalInt(v)
+}
+
+func (ec *executionContext) unmarshalOInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	return graphql.UnmarshalInt64(v)
+}
+
+func (ec *executionContext) marshalOInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	return graphql.MarshalInt64(v)
+}
+
+func (ec *executionContext) marshalONewznab2githubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v newznab.NZB) graphql.Marshaler {
+	return ec._Newznab(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalONewznab2ᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v *newznab.NZB) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Newznab(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalONewznabCategory2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, v interface{}) (model.NewznabCategory, error) {
+	var res model.NewznabCategory
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalONewznabCategory2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, sel ast.SelectionSet, v model.NewznabCategory) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, v interface{}) (*model.NewznabCategory, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONewznabCategory2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, sel ast.SelectionSet, v *model.NewznabCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) marshalONewznabComment2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx context.Context, sel ast.SelectionSet, v model.NewznabComment) graphql.Marshaler {
+	return ec._NewznabComment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalONewznabComment2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx context.Context, sel ast.SelectionSet, v []*model.NewznabComment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONewznabComment2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalONewznabComment2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx context.Context, sel ast.SelectionSet, v *model.NewznabComment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._NewznabComment(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOSeries2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx context.Context, sel ast.SelectionSet, v model1.Series) graphql.Marshaler {
 	return ec._Series(ctx, sel, &v)
 }
@@ -5844,6 +7811,29 @@ func (ec *executionContext) marshalOTVDBSeries2ᚖgithubᚗcomᚋpiozᚋtvdbᚐS
 		return graphql.Null
 	}
 	return ec._TVDBSeries(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	return graphql.UnmarshalTime(v)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	return graphql.MarshalTime(v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOTime2timeᚐTime(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

@@ -8,7 +8,9 @@ import (
 
 	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
+	graphModel "github.com/bottleneckco/showgrabber/src/backend/graph/model"
 	"github.com/bottleneckco/showgrabber/src/backend/model"
+	"github.com/mrobinsn/go-newznab/newznab"
 	"github.com/pioz/tvdb"
 )
 
@@ -32,6 +34,19 @@ func (r *queryResolver) TvdbSeriesSearch(ctx context.Context, term string) ([]*t
 	}
 
 	return results, nil
+}
+
+func (r *queryResolver) NzbSearch(ctx context.Context, categories []*graphModel.NewznabCategory, term string) ([]*newznab.NZB, error) {
+	var results []*newznab.NZB
+
+	nzbResults, err := newznabClient.SearchWithQuery(convertNZBCategories(categories), term, "search")
+
+	for _, nzbResult := range nzbResults {
+		var result = nzbResult
+		results = append(results, &result)
+	}
+
+	return results, err
 }
 
 // Query returns generated.QueryResolver implementation.

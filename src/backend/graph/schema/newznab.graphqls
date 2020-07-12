@@ -1,0 +1,69 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Newznab {
+  id: ID
+  title: String
+  description: String
+  size: Int
+  air_date: Time
+  pub_date: Time
+  usenet_date: Time
+  num_grabs: Int
+  num_comments: Int
+  comments: [NewznabComment]
+
+  source_endpoint: String!
+  source_apikey: String!
+  category: [String]
+  info: String
+  genre: String
+
+  resolution: String
+
+  tvdbid: String
+  tvrageid: String
+  tvmazeid: String
+  season: String
+  episode: String
+  tvtitle: String
+  rating: Int
+
+  imdb: String
+  imdbtitle: String
+  imdbyear: Int
+  imdbscore: Float
+  coverurl: String
+
+  seeders: Int
+  peers: Int
+  infohash: String
+  download_url: String
+  is_torrent: Boolean 
+}
+
+enum NewznabCategory {
+  TV_ALL
+  TV_FOREIGN
+  TV_SD
+  TV_HD
+  TV_UHD
+  TV_OTHER
+  TV_SPORT
+
+  MOVIE_ALL
+  MOVIE_FOREIGN
+  MOVIE_OTHER
+  MOVIE_SD
+  MOVIE_HD
+  MOVIE_UHD
+  MOVIE_BLURAY
+  MOVIE_3D
+}
+
+type NewznabComment {
+  title: String
+  content: String
+  pub_date: Time
+}
