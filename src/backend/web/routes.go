@@ -16,7 +16,7 @@ func StartServer() {
 	r := gin.Default()
 
 	corsCfg := cors.DefaultConfig()
-	corsCfg.AllowOrigins = []string{"http://localhost:1234"}
+	corsCfg.AllowOrigins = []string{"http://localhost:3000"}
 	r.Use(cors.New(corsCfg))
 
 	r.GET("/graphql", graphQLPlayground)

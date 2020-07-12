@@ -42,6 +42,7 @@ const config: webpack.Configuration = {
     port: 3001,
     contentBase: path.join(__dirname, 'dist'),
     hot: true,
+    historyApiFallback: true,
   },
 };
 
