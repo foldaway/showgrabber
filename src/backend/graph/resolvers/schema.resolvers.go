@@ -5,6 +5,7 @@ package resolvers
 
 import (
 	"context"
+	"log"
 	"net/url"
 	"strconv"
 
@@ -36,7 +37,11 @@ func (r *tVDBSeriesResolver) FanArtImages(ctx context.Context, obj *tvdb.Series)
 		results = append(results, &result)
 	}
 
-	return results, err
+	if err != nil {
+		log.Println(err)
+	}
+
+	return results, nil
 }
 
 func (r *tVDBSeriesResolver) PosterImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
@@ -50,7 +55,11 @@ func (r *tVDBSeriesResolver) PosterImages(ctx context.Context, obj *tvdb.Series)
 		results = append(results, &result)
 	}
 
-	return results, err
+	if err != nil {
+		log.Println(err)
+	}
+
+	return results, nil
 }
 
 func (r *tVDBSeriesResolver) SeasonImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
@@ -64,7 +73,11 @@ func (r *tVDBSeriesResolver) SeasonImages(ctx context.Context, obj *tvdb.Series)
 		results = append(results, &result)
 	}
 
-	return results, err
+	if err != nil {
+		log.Println(err)
+	}
+
+	return results, nil
 }
 
 func (r *tVDBSeriesResolver) SeasonWideImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
@@ -78,7 +91,11 @@ func (r *tVDBSeriesResolver) SeasonWideImages(ctx context.Context, obj *tvdb.Ser
 		results = append(results, &result)
 	}
 
-	return results, err
+	if err != nil {
+		log.Println(err)
+	}
+
+	return results, nil
 }
 
 func (r *tVDBSeriesResolver) SeriesImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
@@ -92,7 +109,11 @@ func (r *tVDBSeriesResolver) SeriesImages(ctx context.Context, obj *tvdb.Series)
 		results = append(results, &result)
 	}
 
-	return results, err
+	if err != nil {
+		log.Println(err)
+	}
+
+	return results, nil
 }
 
 func (r *tVDBSeriesResolver) Summary(ctx context.Context, obj *tvdb.Series) (*tvdb.Summary, error) {
