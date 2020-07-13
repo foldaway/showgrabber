@@ -25,6 +25,76 @@ func (r *tVDBSeriesResolver) SiteRating(ctx context.Context, obj *tvdb.Series) (
 	return float64(obj.SiteRating), nil
 }
 
+func (r *tVDBSeriesResolver) FanArtImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
+	var err = tvdbClient.GetSeriesFanartImages(obj)
+
+	var results []*tvdb.Image
+
+	for _, image := range obj.Images {
+		var result = image
+
+		results = append(results, &result)
+	}
+
+	return results, err
+}
+
+func (r *tVDBSeriesResolver) PosterImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
+	var err = tvdbClient.GetSeriesPosterImages(obj)
+
+	var results []*tvdb.Image
+
+	for _, image := range obj.Images {
+		var result = image
+
+		results = append(results, &result)
+	}
+
+	return results, err
+}
+
+func (r *tVDBSeriesResolver) SeasonImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
+	var err = tvdbClient.GetSeriesSeasonImages(obj)
+
+	var results []*tvdb.Image
+
+	for _, image := range obj.Images {
+		var result = image
+
+		results = append(results, &result)
+	}
+
+	return results, err
+}
+
+func (r *tVDBSeriesResolver) SeasonWideImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
+	var err = tvdbClient.GetSeriesSeasonwideImages(obj)
+
+	var results []*tvdb.Image
+
+	for _, image := range obj.Images {
+		var result = image
+
+		results = append(results, &result)
+	}
+
+	return results, err
+}
+
+func (r *tVDBSeriesResolver) SeriesImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error) {
+	var err = tvdbClient.GetSeriesSeriesImages(obj)
+
+	var results []*tvdb.Image
+
+	for _, image := range obj.Images {
+		var result = image
+
+		results = append(results, &result)
+	}
+
+	return results, err
+}
+
 func (r *tVDBSeriesResolver) Summary(ctx context.Context, obj *tvdb.Series) (*tvdb.Summary, error) {
 	err := tvdbClient.GetSeriesSummary(obj)
 	if err != nil {

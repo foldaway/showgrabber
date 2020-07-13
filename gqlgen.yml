@@ -60,3 +60,13 @@ models:
         resolver: true
       episodes:
         resolver: true
+      fanArtImages:
+        resolver: true
+      posterImages:
+        resolver: true
+      seasonImages:
+        resolver: true
+      seasonWideImages:
+        resolver: true
+      seriesImages:
+        resolver: true

@@ -7,3 +7,7 @@ type TVDBSeries = tvdb.Series
 type TVDBSeriesSummary = tvdb.Summary
 
 type TVDBEpisode = tvdb.Episode
+
+type TVDBImage = tvdb.Image
+
+type TVDBRating = tvdb.Rating

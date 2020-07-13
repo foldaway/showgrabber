@@ -9,6 +9,22 @@ type Series {
   banner: String!
 }
 
+type TVDBRating {
+  average: Float!
+  count: Int!
+}
+
+type TVDBImage {
+  fileName: String!
+  id: ID!
+  keyType: String!
+  languageId: Int!
+  resolution: String!
+  subKey: String!
+  thumbnail: String!
+  ratingsInfo: TVDBRating!
+}
+
 type TVDBEpisode {
   absoluteNumber: Int!
   airedEpisodeNumber: Int!
@@ -73,6 +89,12 @@ type TVDBSeries {
   siteRatingCount: Int!
   status: String!
   zap2itId: String!
+
+  fanArtImages: [TVDBImage]!
+  posterImages: [TVDBImage]!
+  seasonImages: [TVDBImage]!
+  seasonWideImages: [TVDBImage]!
+  seriesImages: [TVDBImage]!
 
   summary: TVDBSeriesSummary!
   episodes(season: Int!): [TVDBEpisode]!
