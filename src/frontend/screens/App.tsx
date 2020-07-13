@@ -23,8 +23,8 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Wrapper>
-        <Header />
         <BrowserRouter>
+          <Header />
           <Switch>
             <Route path="/add" component={SeriesAdd} exact />
             <Route path="/" component={SeriesList} />
