@@ -44,6 +44,11 @@ namespace GraphQLTypes {
     status: string;
     zap2itId: string;
 
+    summary: {
+      airedEpisodes: string;
+      airedSeasons: string[];
+    };
+
     fanArtImages: TVDBImage[];
     posterImages: TVDBImage[];
     seasonImages: TVDBImage[];

@@ -13,6 +13,18 @@ import SeriesList from './SeriesList';
 
 const Wrapper = styled.div`
   font-family: -apple-system, 'Segoe UI', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  height: 100%;
+`;
+
+const ContentWrapper = styled.div`
+  overflow: hidden;
 `;
 
 const client = new ApolloClient({
@@ -25,10 +37,12 @@ function App() {
       <Wrapper>
         <BrowserRouter>
           <Header />
-          <Switch>
-            <Route path="/add" component={SeriesAdd} exact />
-            <Route path="/" component={SeriesList} />
-          </Switch>
+          <ContentWrapper>
+            <Switch>
+              <Route path="/add" component={SeriesAdd} exact />
+              <Route path="/" component={SeriesList} />
+            </Switch>
+          </ContentWrapper>
         </BrowserRouter>
       </Wrapper>
     </ApolloProvider>

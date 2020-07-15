@@ -1,17 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
-import TVDBSeries from '../../components/TVDBSeries';
+import { gql } from 'apollo-boost';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import { useDebounce } from 'use-debounce';
 
-const Wrapper = styled.div``;
+import TVDBSeries from '../../components/TVDBSeries';
 
-const Input = styled.input``;
+const Wrapper = styled.div`
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  height: 100%;
+`;
+
+const Input = styled.input`
+  font-size: 1em;
+  border-radius: 3px;
+`;
 
 const ResultsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  column-gap: 32px;
+  row-gap 32px;
+  margin-top: 16px;
+  overflow-y: scroll;
 `;
 
 const SERIES_SEARCH = gql`

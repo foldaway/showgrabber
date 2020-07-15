@@ -4,26 +4,50 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   display: grid;
   grid-template-areas:
-    'art title'
-    'art overview';
-  grid-template-columns: auto 1fr;
-  column-gap: 16px;
-  padding: 16px;
-  border: 1px solid blue;
+    'art'
+    'title'
+    'add-button';
+  grid-template-rows: 6fr 1fr;
+  row-gap: 8px;
 `;
 
-const Title = styled.h3`
+const Title = styled.span`
   grid-area: title;
+  margin: 0;
+  color: #262626;
+  font-size: 0.9em;
+  font-weight: 600;
 `;
 
-const Overview = styled.span`
-  grid-area: overview;
+const ImageContainer = styled.div`
+  position: relative;
 `;
 
 const Image = styled.img`
   grid-area: art;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
   background-color: #888;
-  width: 200px;
+  object-fit: cover;
+  box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.2);
+`;
+
+const AddButton = styled.button`
+  grid-area: add-button;
+  font-size: 0.85em;
+`;
+
+const Network = styled.span`
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 5px;
+  border-radius: 3px;
+  background-color: #262626;
+  color: white;
+  font-size: 0.65em;
+  font-weight: 900;
 `;
 
 interface Props {
@@ -35,11 +59,14 @@ const TVDBSeries: React.FC<Props> = function (props) {
 
   return (
     <Wrapper>
-      <Image
-        src={`https://thetvdb.com/banners/${series.posterImages?.[0]?.thumbnail}`}
-      />
+      <ImageContainer>
+        <Image
+          src={`https://thetvdb.com/banners/${series.posterImages?.[0]?.thumbnail}`}
+        />
+        {series.network.length > 0 && <Network>{series.network}</Network>}
+      </ImageContainer>
       <Title>{series.seriesName}</Title>
-      <Overview>{series.overview}</Overview>
+      <AddButton>Add to Library</AddButton>
     </Wrapper>
   );
 };
