@@ -1,7 +1,7 @@
-import * as path from 'path';
-import * as webpack from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import * as path from 'path';
+import * as webpack from 'webpack';
 
 const config: webpack.Configuration = {
   mode: 'development',
@@ -9,7 +9,7 @@ const config: webpack.Configuration = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'frontend.bundle.js',
-    publicPath: 'dist',
+    publicPath: '/',
   },
   devtool: 'source-map',
   module: {
@@ -41,6 +41,7 @@ const config: webpack.Configuration = {
   devServer: {
     port: 3001,
     contentBase: path.join(__dirname, 'dist'),
+    publicPath: '/',
     hot: true,
     historyApiFallback: true,
   },
