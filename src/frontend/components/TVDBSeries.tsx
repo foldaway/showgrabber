@@ -1,5 +1,3 @@
-import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -52,36 +50,13 @@ const Network = styled.span`
   font-weight: 900;
 `;
 
-const SERIES_ADD = gql`
-  mutation($input: SeriesAddInput!) {
-    seriesAdd(input: $input) {
-      ok
-      series {
-        id
-        status
-        banner
-      }
-    }
-  }
-`;
-
 interface Props {
   series: GraphQLTypes.TVDBSeries;
+  onAddClicked(series: GraphQLTypes.TVDBSeries): void;
 }
 
 const TVDBSeries: React.FC<Props> = function (props) {
-  const { series } = props;
-
-  const [seriesAdd] = useMutation(SERIES_ADD, {
-    variables: {
-      input: {
-        name: series.seriesName,
-        status: series.status,
-        banner: series.banner,
-        tvdbID: series.id,
-      },
-    },
-  });
+  const { series, onAddClicked } = props;
 
   return (
     <Wrapper>
@@ -92,7 +67,7 @@ const TVDBSeries: React.FC<Props> = function (props) {
         {series.network.length > 0 && <Network>{series.network}</Network>}
       </ImageContainer>
       <Title>{series.seriesName}</Title>
-      <AddButton onClick={() => seriesAdd()}>Add to Library</AddButton>
+      <AddButton onClick={() => onAddClicked(series)}>Add to Library</AddButton>
     </Wrapper>
   );
 };

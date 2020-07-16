@@ -1,6 +1,6 @@
-import { useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { useDebounce } from 'use-debounce';
 
@@ -51,6 +51,19 @@ const SERIES_SEARCH = gql`
   }
 `;
 
+const SERIES_ADD = gql`
+  mutation($input: SeriesAddInput!) {
+    seriesAdd(input: $input) {
+      ok
+      series {
+        id
+        status
+        banner
+      }
+    }
+  }
+`;
+
 const SeriesAdd: React.FC = function () {
   const [value, setValue] = useState('');
   const [term] = useDebounce(value, 300);
@@ -64,6 +77,21 @@ const SeriesAdd: React.FC = function () {
     skip: term.length === 0,
   });
 
+  const [seriesAdd] = useMutation(SERIES_ADD);
+
+  const handleAddClicked = useCallback(
+    (series: GraphQLTypes.TVDBSeries) => {
+      seriesAdd({
+        variables: {
+          input: {
+            tvdbID: series.id,
+          },
+        },
+      });
+    },
+    [seriesAdd]
+  );
+
   return (
     <Wrapper>
       <Input
@@ -76,7 +104,11 @@ const SeriesAdd: React.FC = function () {
       {loading && <span>Loading</span>}
       <ResultsContainer>
         {data?.tvdbSeriesSearch?.map((series) => (
-          <TVDBSeries key={series.id} series={series} />
+          <TVDBSeries
+            key={series.id}
+            series={series}
+            onAddClicked={handleAddClicked}
+          />
         ))}
       </ResultsContainer>
     </Wrapper>
