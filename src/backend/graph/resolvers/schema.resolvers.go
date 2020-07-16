@@ -28,20 +28,10 @@ func (r *seasonResolver) Number(ctx context.Context, obj *model.Season) (int, er
 }
 
 func (r *seasonResolver) Episodes(ctx context.Context, obj *model.Season) ([]*model.Episode, error) {
-	var results []*model.Episode
+	var dbResults []*model.Episode
+	var err = db.DB.Where(&model.Episode{SeasonID: obj.ID}).Find(&dbResults).Error
 
-	var dbResults []model.Episode
-	var err = db.DB.Where(&model.Episode{SeasonID: obj.ID}).Find(&dbResults)
-	if err != nil {
-		return results, nil
-	}
-
-	for _, item := range dbResults {
-		var result = item
-		results = append(results, &result)
-	}
-
-	return results, nil
+	return dbResults, err
 }
 
 func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (string, error) {
@@ -49,20 +39,10 @@ func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (string, err
 }
 
 func (r *seriesResolver) Seasons(ctx context.Context, obj *model.Series) ([]*model.Season, error) {
-	var results []*model.Season
+	var dbResults []*model.Season
+	var err = db.DB.Where(&model.Season{SeriesID: obj.ID}).Find(&dbResults).Error
 
-	var dbResults []model.Season
-	var err = db.DB.Where(&model.Season{SeriesID: obj.ID}).Find(&dbResults)
-	if err != nil {
-		return results, nil
-	}
-
-	for _, item := range dbResults {
-		var result = item
-		results = append(results, &result)
-	}
-
-	return results, nil
+	return dbResults, err
 }
 
 func (r *tVDBEpisodeResolver) SiteRating(ctx context.Context, obj *tvdb.Episode) (float64, error) {
