@@ -121,9 +121,6 @@ type TVDBSeries {
 }
 
 input SeriesAddInput {
-  name: String!
-  status: String!
-  banner: String!
   tvdbID: Int!
 }
 

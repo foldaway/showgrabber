@@ -18,10 +18,7 @@ type NewznabComment struct {
 }
 
 type SeriesAddInput struct {
-	Name   string `json:"name"`
-	Status string `json:"status"`
-	Banner string `json:"banner"`
-	TvdbID int    `json:"tvdbID"`
+	TvdbID int `json:"tvdbID"`
 }
 
 type SeriesAddPayload struct {

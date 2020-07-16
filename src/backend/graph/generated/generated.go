@@ -1498,9 +1498,6 @@ type TVDBSeries {
 }
 
 input SeriesAddInput {
-  name: String!
-  status: String!
-  banner: String!
   tvdbID: Int!
 }
 
@@ -7137,24 +7134,6 @@ func (ec *executionContext) unmarshalInputSeriesAddInput(ctx context.Context, ob
 
 	for k, v := range asMap {
 		switch k {
-		case "name":
-			var err error
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "status":
-			var err error
-			it.Status, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "banner":
-			var err error
-			it.Banner, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "tvdbID":
 			var err error
 			it.TvdbID, err = ec.unmarshalNInt2int(ctx, v)
