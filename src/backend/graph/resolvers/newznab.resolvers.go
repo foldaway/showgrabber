@@ -12,6 +12,10 @@ import (
 	"github.com/mrobinsn/go-newznab/newznab"
 )
 
+func (r *newznabResolver) ID(ctx context.Context, obj *newznab.NZB) (*int, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *newznabResolver) Comments(ctx context.Context, obj *newznab.NZB) ([]*model.NewznabComment, error) {
 	panic(fmt.Errorf("not implemented"))
 }

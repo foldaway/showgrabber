@@ -15,12 +15,12 @@ import (
 	"github.com/pioz/tvdb"
 )
 
-func (r *episodeResolver) ID(ctx context.Context, obj *model.Episode) (string, error) {
-	return string(obj.ID), nil
+func (r *episodeResolver) ID(ctx context.Context, obj *model.Episode) (int, error) {
+	return int(obj.ID), nil
 }
 
-func (r *seasonResolver) ID(ctx context.Context, obj *model.Season) (string, error) {
-	return string(obj.ID), nil
+func (r *seasonResolver) ID(ctx context.Context, obj *model.Season) (int, error) {
+	return int(obj.ID), nil
 }
 
 func (r *seasonResolver) Number(ctx context.Context, obj *model.Season) (int, error) {
@@ -34,8 +34,8 @@ func (r *seasonResolver) Episodes(ctx context.Context, obj *model.Season) ([]*mo
 	return dbResults, err
 }
 
-func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (string, error) {
-	return strconv.Itoa(int(obj.ID)), nil
+func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (int, error) {
+	return int(obj.ID), nil
 }
 
 func (r *seriesResolver) Seasons(ctx context.Context, obj *model.Series) ([]*model.Season, error) {

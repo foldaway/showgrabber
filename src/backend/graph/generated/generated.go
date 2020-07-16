@@ -224,12 +224,14 @@ type ComplexityRoot struct {
 }
 
 type EpisodeResolver interface {
-	ID(ctx context.Context, obj *model1.Episode) (string, error)
+	ID(ctx context.Context, obj *model1.Episode) (int, error)
 }
 type MutationResolver interface {
 	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
 }
 type NewznabResolver interface {
+	ID(ctx context.Context, obj *newznab.NZB) (*int, error)
+
 	Comments(ctx context.Context, obj *newznab.NZB) ([]*model.NewznabComment, error)
 
 	Imdb(ctx context.Context, obj *newznab.NZB) (*string, error)
@@ -242,12 +244,12 @@ type QueryResolver interface {
 	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*newznab.NZB, error)
 }
 type SeasonResolver interface {
-	ID(ctx context.Context, obj *model1.Season) (string, error)
+	ID(ctx context.Context, obj *model1.Season) (int, error)
 	Number(ctx context.Context, obj *model1.Season) (int, error)
 	Episodes(ctx context.Context, obj *model1.Season) ([]*model1.Episode, error)
 }
 type SeriesResolver interface {
-	ID(ctx context.Context, obj *model1.Series) (string, error)
+	ID(ctx context.Context, obj *model1.Series) (int, error)
 
 	Seasons(ctx context.Context, obj *model1.Series) ([]*model1.Season, error)
 }
@@ -1646,9 +1648,9 @@ func (ec *executionContext) _Episode_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Episode_title(ctx context.Context, field graphql.CollectedField, obj *model1.Episode) (ret graphql.Marshaler) {
@@ -1805,13 +1807,13 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 		Object:   "Newznab",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Newznab().ID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1820,9 +1822,9 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalOID2string(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
@@ -3130,9 +3132,9 @@ func (ec *executionContext) _Season_id(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Season_number(ctx context.Context, field graphql.CollectedField, obj *model1.Season) (ret graphql.Marshaler) {
@@ -3232,9 +3234,9 @@ func (ec *executionContext) _Series_id(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Series_name(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
@@ -7204,7 +7206,16 @@ func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Newznab")
 		case "id":
-			out.Values[i] = ec._Newznab_id(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Newznab_id(ctx, field, obj)
+				return res
+			})
 		case "title":
 			out.Values[i] = ec._Newznab_title(ctx, field, obj)
 		case "description":
@@ -8453,25 +8464,11 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 }
 
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
-	return graphql.UnmarshalInt(v)
+	return graphql.UnmarshalIntID(v)
 }
 
 func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	res := graphql.MarshalInt(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	return graphql.UnmarshalID(v)
-}
-
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
+	res := graphql.MarshalIntID(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -9163,12 +9160,27 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return ec.marshalOFloat2float64(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalOID2string(ctx context.Context, v interface{}) (string, error) {
-	return graphql.UnmarshalID(v)
+func (ec *executionContext) unmarshalOID2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalIntID(v)
 }
 
-func (ec *executionContext) marshalOID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalID(v)
+func (ec *executionContext) marshalOID2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	return graphql.MarshalIntID(v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOID2int(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOID2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOID2int(ctx, sel, *v)
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
