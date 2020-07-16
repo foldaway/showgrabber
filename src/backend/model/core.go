@@ -5,9 +5,20 @@ import "time"
 // Series represents a television series
 type Series struct {
 	BaseModel
-	Name   string `json:"name"`
-	Status string `json:"status"`
-	Banner string `json:"banner"`
+	Name    string   `json:"name"`
+	Status  string   `json:"status"`
+	Banner  string   `json:"banner"`
+	TvdbID  int      `json:"tvdbID"`
+	Seasons []Season `json:"seasons"`
+}
+
+// Season represents a season in a series
+type Season struct {
+	BaseModel
+	Name     string    `json:"name"`
+	Episodes []Episode `json:"episodes"`
+	SeriesID uint
+	Series   Series `json:"series"`
 }
 
 // Episode represents an episode in a series
@@ -16,8 +27,8 @@ type Episode struct {
 	Title    string    `json:"title"`
 	Number   int       `json:"number"`
 	AirDate  time.Time `json:"airDate"`
-	SeriesID uint
-	Series   Series
+	SeasonID uint
+	Season   Season `json:"season"`
 }
 
 type EpisodeFile struct {

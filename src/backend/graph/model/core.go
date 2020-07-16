@@ -5,3 +5,7 @@ import (
 )
 
 type Series = mainModel.Series
+
+type Season = mainModel.Season
+
+type Episode = mainModel.Episode
