@@ -192,7 +192,7 @@ type ComplexityRoot struct {
 		AirsTime         func(childComplexity int) int
 		Aliases          func(childComplexity int) int
 		Banner           func(childComplexity int) int
-		Episodes         func(childComplexity int, season int) int
+		Episodes         func(childComplexity int, season *int) int
 		FanArtImages     func(childComplexity int) int
 		FirstAired       func(childComplexity int) int
 		Genre            func(childComplexity int) int
@@ -265,7 +265,7 @@ type TVDBSeriesResolver interface {
 	SeasonWideImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error)
 	SeriesImages(ctx context.Context, obj *tvdb.Series) ([]*tvdb.Image, error)
 	Summary(ctx context.Context, obj *tvdb.Series) (*tvdb.Summary, error)
-	Episodes(ctx context.Context, obj *tvdb.Series, season int) ([]*tvdb.Episode, error)
+	Episodes(ctx context.Context, obj *tvdb.Series, season *int) ([]*tvdb.Episode, error)
 }
 
 type executableSchema struct {
@@ -1043,7 +1043,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.TVDBSeries.Episodes(childComplexity, args["season"].(int)), true
+		return e.complexity.TVDBSeries.Episodes(childComplexity, args["season"].(*int)), true
 
 	case "TVDBSeries.fanArtImages":
 		if e.complexity.TVDBSeries.FanArtImages == nil {
@@ -1503,7 +1503,7 @@ type TVDBSeries {
   seriesImages: [TVDBImage]!
 
   summary: TVDBSeriesSummary!
-  episodes(season: Int!): [TVDBEpisode]!
+  episodes(season: Int): [TVDBEpisode]!
 }
 
 input SeriesAddInput {
@@ -1589,9 +1589,9 @@ func (ec *executionContext) field_Query_tvdbSeriesSearch_args(ctx context.Contex
 func (ec *executionContext) field_TVDBSeries_episodes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 *int
 	if tmp, ok := rawArgs["season"]; ok {
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5963,7 +5963,7 @@ func (ec *executionContext) _TVDBSeries_episodes(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.TVDBSeries().Episodes(rctx, obj, args["season"].(int))
+		return ec.resolvers.TVDBSeries().Episodes(rctx, obj, args["season"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9277,6 +9277,21 @@ func (ec *executionContext) unmarshalOInt2int64(ctx context.Context, v interface
 
 func (ec *executionContext) marshalOInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
 	return graphql.MarshalInt64(v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOInt2int(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOInt2int(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalONewznab2githubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v newznab.NZB) graphql.Marshaler {

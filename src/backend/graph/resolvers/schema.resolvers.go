@@ -168,20 +168,31 @@ func (r *tVDBSeriesResolver) Summary(ctx context.Context, obj *tvdb.Series) (*tv
 	return &obj.Summary, nil
 }
 
-func (r *tVDBSeriesResolver) Episodes(ctx context.Context, obj *tvdb.Series, season int) ([]*tvdb.Episode, error) {
+func (r *tVDBSeriesResolver) Episodes(ctx context.Context, obj *tvdb.Series, season *int) ([]*tvdb.Episode, error) {
 	var results []*tvdb.Episode
 
-	if len(obj.GetSeasonEpisodes(season)) == 0 {
-		err := tvdbClient.GetSeriesEpisodes(obj, url.Values{
-			"airedSeason": {strconv.Itoa(season)},
-		})
+	var values = url.Values{}
 
-		if err != nil {
-			return results, err
-		}
+	if season != nil && len(obj.GetSeasonEpisodes(*season)) == 0 {
+		values["airedSeason"] = []string{strconv.Itoa(*season)}
+	}
+	err := tvdbClient.GetSeriesEpisodes(obj, values)
+
+	if err != nil {
+		return results, err
 	}
 
-	return obj.GetSeasonEpisodes(season), nil
+	if season != nil {
+		return obj.GetSeasonEpisodes(*season), nil
+	}
+
+	for _, episode := range obj.Episodes {
+		var result = episode
+		results = append(results, &result)
+	}
+
+	return results, nil
+
 }
 
 // Episode returns generated.EpisodeResolver implementation.

@@ -118,7 +118,7 @@ type TVDBSeries {
   seriesImages: [TVDBImage]!
 
   summary: TVDBSeriesSummary!
-  episodes(season: Int!): [TVDBEpisode]!
+  episodes(season: Int): [TVDBEpisode]!
 }
 
 input SeriesAddInput {
