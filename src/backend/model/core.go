@@ -7,7 +7,8 @@ type Series struct {
 	BaseModel
 	Name    string   `json:"name"`
 	Status  string   `json:"status"`
-	Banner  string   `json:"banner"`
+	Network string   `json:"network"`
+	Poster  string   `json:"poster"`
 	TvdbID  int      `json:"tvdbID"`
 	Seasons []Season `json:"seasons"`
 }

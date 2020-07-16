@@ -58,7 +58,9 @@ const SERIES_ADD = gql`
       series {
         id
         status
-        banner
+        network
+        poster
+        tvdbID
       }
     }
   }

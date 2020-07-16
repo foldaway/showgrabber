@@ -22,11 +22,22 @@ func (r *mutationResolver) SeriesAdd(ctx context.Context, input model.SeriesAddI
 	if err != nil {
 		return nil, err
 	}
+	err = tvdbClient.GetSeriesPosterImages(tvdbSeries)
+	if err != nil {
+		log.Println(err)
+	}
+
+	var posterURL string
+	if len(tvdbSeries.Images) > 0 {
+		posterURL = tvdbSeries.Images[0].Thumbnail
+	}
 
 	var series = model.Series{
-		Name:   tvdbSeries.SeriesName,
-		Status: tvdbSeries.Status,
-		TvdbID: input.TvdbID,
+		Name:    tvdbSeries.SeriesName,
+		Status:  tvdbSeries.Status,
+		TvdbID:  input.TvdbID,
+		Network: tvdbSeries.Network,
+		Poster:  posterURL,
 	}
 
 	err = db.DB.Create(&series).Error

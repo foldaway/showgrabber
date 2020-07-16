@@ -121,9 +121,10 @@ type ComplexityRoot struct {
 	}
 
 	Series struct {
-		Banner  func(childComplexity int) int
 		ID      func(childComplexity int) int
 		Name    func(childComplexity int) int
+		Network func(childComplexity int) int
+		Poster  func(childComplexity int) int
 		Seasons func(childComplexity int) int
 		Status  func(childComplexity int) int
 		TvdbID  func(childComplexity int) int
@@ -640,13 +641,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Season.Series(childComplexity), true
 
-	case "Series.banner":
-		if e.complexity.Series.Banner == nil {
-			break
-		}
-
-		return e.complexity.Series.Banner(childComplexity), true
-
 	case "Series.id":
 		if e.complexity.Series.ID == nil {
 			break
@@ -660,6 +654,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Series.Name(childComplexity), true
+
+	case "Series.network":
+		if e.complexity.Series.Network == nil {
+			break
+		}
+
+		return e.complexity.Series.Network(childComplexity), true
+
+	case "Series.poster":
+		if e.complexity.Series.Poster == nil {
+			break
+		}
+
+		return e.complexity.Series.Poster(childComplexity), true
 
 	case "Series.seasons":
 		if e.complexity.Series.Seasons == nil {
@@ -1383,7 +1391,8 @@ type Series {
   id: ID!
   name: String!
   status: String!
-  banner: String!
+  network: String!
+  poster: String!
   tvdbID: Int!
 
   seasons: [Season]!
@@ -3383,7 +3392,7 @@ func (ec *executionContext) _Series_status(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Series_banner(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
+func (ec *executionContext) _Series_network(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3400,7 +3409,41 @@ func (ec *executionContext) _Series_banner(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Banner, nil
+		return obj.Network, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Series_poster(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Series",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Poster, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7557,8 +7600,13 @@ func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "banner":
-			out.Values[i] = ec._Series_banner(ctx, field, obj)
+		case "network":
+			out.Values[i] = ec._Series_network(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "poster":
+			out.Values[i] = ec._Series_poster(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
