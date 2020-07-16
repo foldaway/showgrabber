@@ -17,7 +17,6 @@ type Season {
   id: ID!
   number: Int!
 
-  series: Series!
   episodes: [Episode]!
 }
 
@@ -26,8 +25,6 @@ type Episode {
   title: String!
   number: Int!
   airDate: Time!
-
-  season: Season!
 }
 
 type TVDBRating {

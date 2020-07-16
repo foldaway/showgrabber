@@ -57,7 +57,6 @@ type ComplexityRoot struct {
 		AirDate func(childComplexity int) int
 		ID      func(childComplexity int) int
 		Number  func(childComplexity int) int
-		Season  func(childComplexity int) int
 		Title   func(childComplexity int) int
 	}
 
@@ -117,7 +116,6 @@ type ComplexityRoot struct {
 		Episodes func(childComplexity int) int
 		ID       func(childComplexity int) int
 		Number   func(childComplexity int) int
-		Series   func(childComplexity int) int
 	}
 
 	Series struct {
@@ -246,7 +244,6 @@ type QueryResolver interface {
 type SeasonResolver interface {
 	ID(ctx context.Context, obj *model1.Season) (string, error)
 	Number(ctx context.Context, obj *model1.Season) (int, error)
-
 	Episodes(ctx context.Context, obj *model1.Season) ([]*model1.Episode, error)
 }
 type SeriesResolver interface {
@@ -304,13 +301,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Episode.Number(childComplexity), true
-
-	case "Episode.season":
-		if e.complexity.Episode.Season == nil {
-			break
-		}
-
-		return e.complexity.Episode.Season(childComplexity), true
 
 	case "Episode.title":
 		if e.complexity.Episode.Title == nil {
@@ -634,13 +624,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Season.Number(childComplexity), true
-
-	case "Season.series":
-		if e.complexity.Season.Series == nil {
-			break
-		}
-
-		return e.complexity.Season.Series(childComplexity), true
 
 	case "Series.id":
 		if e.complexity.Series.ID == nil {
@@ -1403,7 +1386,6 @@ type Season {
   id: ID!
   number: Int!
 
-  series: Series!
   episodes: [Episode]!
 }
 
@@ -1412,8 +1394,6 @@ type Episode {
   title: String!
   number: Int!
   airDate: Time!
-
-  season: Season!
 }
 
 type TVDBRating {
@@ -1771,40 +1751,6 @@ func (ec *executionContext) _Episode_airDate(ctx context.Context, field graphql.
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Episode_season(ctx context.Context, field graphql.CollectedField, obj *model1.Episode) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Episode",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Season, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model1.Season)
-	fc.Result = res
-	return ec.marshalNSeason2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeason(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_seriesAdd(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3221,40 +3167,6 @@ func (ec *executionContext) _Season_number(ctx context.Context, field graphql.Co
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Season_series(ctx context.Context, field graphql.CollectedField, obj *model1.Season) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Season",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Series, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model1.Series)
-	fc.Result = res
-	return ec.marshalNSeries2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Season_episodes(ctx context.Context, field graphql.CollectedField, obj *model1.Season) (ret graphql.Marshaler) {
@@ -7238,11 +7150,6 @@ func (ec *executionContext) _Episode(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "season":
-			out.Values[i] = ec._Episode_season(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7545,11 +7452,6 @@ func (ec *executionContext) _Season(ctx context.Context, sel ast.SelectionSet, o
 				}
 				return res
 			})
-		case "series":
-			out.Values[i] = ec._Season_series(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "episodes":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -8684,10 +8586,6 @@ func (ec *executionContext) marshalNNewznabCategory2ᚕᚖgithubᚗcomᚋbottlen
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) marshalNSeason2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeason(ctx context.Context, sel ast.SelectionSet, v model1.Season) graphql.Marshaler {
-	return ec._Season(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNSeason2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeason(ctx context.Context, sel ast.SelectionSet, v []*model1.Season) graphql.Marshaler {
