@@ -2,6 +2,24 @@ namespace GraphQLTypes {
   export interface Series {
     id: string;
     name: string;
+    status: string;
+    network: string;
+    poster: string;
+    tvdbID: number;
+
+    seasons: Season[];
+  }
+
+  export interface Season {
+    id: string;
+    number: number;
+    episodes: Episode[];
+  }
+
+  export interface Episode {
+    title: string;
+    number: number;
+    airDate: string;
   }
 
   export interface TVDBRating {
