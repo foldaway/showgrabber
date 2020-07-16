@@ -9,13 +9,56 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
 	"github.com/bottleneckco/showgrabber/src/backend/model"
 	"github.com/pioz/tvdb"
 )
 
+func (r *episodeResolver) ID(ctx context.Context, obj *model.Episode) (string, error) {
+	return string(obj.ID), nil
+}
+
+func (r *seasonResolver) ID(ctx context.Context, obj *model.Season) (string, error) {
+	return string(obj.ID), nil
+}
+
+func (r *seasonResolver) Episodes(ctx context.Context, obj *model.Season) ([]*model.Episode, error) {
+	var results []*model.Episode
+
+	var dbResults []model.Episode
+	var err = db.DB.Where(&model.Episode{SeasonID: obj.ID}).Find(&dbResults)
+	if err != nil {
+		return results, nil
+	}
+
+	for _, item := range dbResults {
+		var result = item
+		results = append(results, &result)
+	}
+
+	return results, nil
+}
+
 func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (string, error) {
 	return strconv.Itoa(int(obj.ID)), nil
+}
+
+func (r *seriesResolver) Seasons(ctx context.Context, obj *model.Series) ([]*model.Season, error) {
+	var results []*model.Season
+
+	var dbResults []model.Season
+	var err = db.DB.Where(&model.Season{SeriesID: obj.ID}).Find(&dbResults)
+	if err != nil {
+		return results, nil
+	}
+
+	for _, item := range dbResults {
+		var result = item
+		results = append(results, &result)
+	}
+
+	return results, nil
 }
 
 func (r *tVDBEpisodeResolver) SiteRating(ctx context.Context, obj *tvdb.Episode) (float64, error) {
@@ -141,6 +184,12 @@ func (r *tVDBSeriesResolver) Episodes(ctx context.Context, obj *tvdb.Series, sea
 	return obj.GetSeasonEpisodes(season), nil
 }
 
+// Episode returns generated.EpisodeResolver implementation.
+func (r *Resolver) Episode() generated.EpisodeResolver { return &episodeResolver{r} }
+
+// Season returns generated.SeasonResolver implementation.
+func (r *Resolver) Season() generated.SeasonResolver { return &seasonResolver{r} }
+
 // Series returns generated.SeriesResolver implementation.
 func (r *Resolver) Series() generated.SeriesResolver { return &seriesResolver{r} }
 
@@ -150,6 +199,8 @@ func (r *Resolver) TVDBEpisode() generated.TVDBEpisodeResolver { return &tVDBEpi
 // TVDBSeries returns generated.TVDBSeriesResolver implementation.
 func (r *Resolver) TVDBSeries() generated.TVDBSeriesResolver { return &tVDBSeriesResolver{r} }
 
+type episodeResolver struct{ *Resolver }
+type seasonResolver struct{ *Resolver }
 type seriesResolver struct{ *Resolver }
 type tVDBEpisodeResolver struct{ *Resolver }
 type tVDBSeriesResolver struct{ *Resolver }

@@ -18,6 +18,7 @@ func (r *mutationResolver) SeriesAdd(ctx context.Context, input model.SeriesAddI
 		Name:   input.Name,
 		Status: input.Status,
 		Banner: input.Banner,
+		TvdbID: input.TvdbID,
 	}
 
 	var err = db.DB.Create(&series).Error

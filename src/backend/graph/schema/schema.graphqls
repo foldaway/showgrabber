@@ -7,6 +7,26 @@ type Series {
   name: String!
   status: String!
   banner: String!
+  tvdbID: Int!
+
+  seasons: [Season]!
+}
+
+type Season {
+  id: ID!
+  name: String!
+
+  series: Series!
+  episodes: [Episode]!
+}
+
+type Episode {
+  id: ID!
+  title: String!
+  number: Int!
+  airDate: Time!
+
+  season: Season!
 }
 
 type TVDBRating {
@@ -104,6 +124,7 @@ input SeriesAddInput {
   name: String!
   status: String!
   banner: String!
+  tvdbID: Int!
 }
 
 type SeriesAddPayload {
