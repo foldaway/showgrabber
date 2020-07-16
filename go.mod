@@ -10,5 +10,6 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/mrobinsn/go-newznab v1.1.0
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
+	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
 	github.com/vektah/gqlparser/v2 v2.0.1
 )

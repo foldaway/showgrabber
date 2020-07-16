@@ -5,6 +5,7 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/url"
 	"strconv"
@@ -21,6 +22,10 @@ func (r *episodeResolver) ID(ctx context.Context, obj *model.Episode) (string, e
 
 func (r *seasonResolver) ID(ctx context.Context, obj *model.Season) (string, error) {
 	return string(obj.ID), nil
+}
+
+func (r *seasonResolver) Number(ctx context.Context, obj *model.Season) (int, error) {
+	return int(obj.Number), nil
 }
 
 func (r *seasonResolver) Episodes(ctx context.Context, obj *model.Season) ([]*model.Episode, error) {
@@ -192,7 +197,6 @@ func (r *tVDBSeriesResolver) Episodes(ctx context.Context, obj *tvdb.Series, sea
 	}
 
 	return results, nil
-
 }
 
 // Episode returns generated.EpisodeResolver implementation.

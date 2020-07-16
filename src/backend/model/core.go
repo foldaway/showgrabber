@@ -16,7 +16,7 @@ type Series struct {
 // Season represents a season in a series
 type Season struct {
 	BaseModel
-	Name     string    `json:"name"`
+	Number   uint      `json:"number"`
 	Episodes []Episode `json:"episodes"`
 	SeriesID uint
 	Series   Series `json:"series"`

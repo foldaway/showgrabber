@@ -15,7 +15,7 @@ type Series {
 
 type Season {
   id: ID!
-  name: String!
+  number: Int!
 
   series: Series!
   episodes: [Episode]!
