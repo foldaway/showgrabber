@@ -21,7 +21,8 @@ const Input = styled.input`
 
 const ResultsContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-rows:  repeat(auto-fill, minmax(350px, max-content));
   column-gap: 32px;
   row-gap 32px;
   margin-top: 16px;

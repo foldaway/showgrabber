@@ -7,7 +7,7 @@ const Wrapper = styled.div`
     'art'
     'title'
     'add-button';
-  grid-template-rows: 6fr 1fr;
+  grid-template-rows: 6fr 1fr 1fr;
   row-gap: 8px;
 `;
 
