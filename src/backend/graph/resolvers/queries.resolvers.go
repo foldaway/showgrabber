@@ -20,6 +20,12 @@ func (r *queryResolver) Series(ctx context.Context) ([]*model.Series, error) {
 	return results, err
 }
 
+func (r *queryResolver) SeriesByID(ctx context.Context, id *int) (*model.Series, error) {
+	var result model.Series
+	var err = db.DB.Model(&model.Series{}).First(&result, *id).Error
+	return &result, err
+}
+
 func (r *queryResolver) TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error) {
 	var results []*tvdb.Series
 

@@ -109,6 +109,7 @@ type ComplexityRoot struct {
 	Query struct {
 		NzbSearch        func(childComplexity int, categories []*model.NewznabCategory, term string) int
 		Series           func(childComplexity int) int
+		SeriesByID       func(childComplexity int, id *int) int
 		TvdbSeriesSearch func(childComplexity int, term string) int
 	}
 
@@ -241,6 +242,7 @@ type NewznabResolver interface {
 }
 type QueryResolver interface {
 	Series(ctx context.Context) ([]*model1.Series, error)
+	SeriesByID(ctx context.Context, id *int) (*model1.Series, error)
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
 	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*newznab.NZB, error)
 }
@@ -594,6 +596,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Series(childComplexity), true
+
+	case "Query.seriesByID":
+		if e.complexity.Query.SeriesByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_seriesByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.SeriesByID(childComplexity, args["id"].(*int)), true
 
 	case "Query.tvdbSeriesSearch":
 		if e.complexity.Query.TvdbSeriesSearch == nil {
@@ -1369,6 +1383,7 @@ type NewznabComment {
 
 type Query {
   series: [Series]!
+  seriesByID(id: ID): Series!
   tvdbSeriesSearch(term: String!): [TVDBSeries]!
 
   nzbSearch(categories: [NewznabCategory]!, term: String!): [Newznab]!
@@ -1561,6 +1576,20 @@ func (ec *executionContext) field_Query_nzbSearch_args(ctx context.Context, rawA
 		}
 	}
 	args["term"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_seriesByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalOID2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -2959,6 +2988,47 @@ func (ec *executionContext) _Query_series(ctx context.Context, field graphql.Col
 	res := resTmp.([]*model1.Series)
 	fc.Result = res
 	return ec.marshalNSeries2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_seriesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_seriesByID_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SeriesByID(rctx, args["id"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model1.Series)
+	fc.Result = res
+	return ec.marshalNSeries2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_tvdbSeriesSearch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7419,6 +7489,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_series(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "seriesByID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_seriesByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
