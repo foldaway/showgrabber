@@ -5,10 +5,9 @@ const Wrapper = styled.div`
   display: grid;
   grid-template-areas:
     'image'
-    'title'
-    'overview';
+    'title';
   grid-template-columns: 1fr;
-  grid-template-rows: 6fr 1fr 1fr;
+  grid-template-rows: 6fr 1fr;
   row-gap: 8px;
 `;
 
@@ -43,10 +42,6 @@ const Title = styled.h3`
   margin: 0;
 `;
 
-const Overview = styled.span`
-  grid-area: overview;
-`;
-
 interface Props {
   series: GraphQLTypes.Series;
 }
@@ -61,7 +56,6 @@ const Series: React.FC<Props> = function (props) {
         <Network>{series.network}</Network>
       </ImageContainer>
       <Title>{series.name}</Title>
-      <Overview />
     </Wrapper>
   );
 };

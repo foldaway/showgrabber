@@ -13,6 +13,7 @@ const SERIES = gql`
       poster
       status
       network
+      overview
     }
   }
 `;

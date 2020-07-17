@@ -9,6 +9,7 @@ type Series {
   network: String!
   poster: String!
   tvdbID: Int!
+  overview: String!
 
   seasons: [Season]!
 }

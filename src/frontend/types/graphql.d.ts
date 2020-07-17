@@ -6,6 +6,7 @@ namespace GraphQLTypes {
     network: string;
     poster: string;
     tvdbID: number;
+    overview: string;
 
     seasons: Season[];
   }

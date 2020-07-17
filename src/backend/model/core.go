@@ -5,12 +5,13 @@ import "time"
 // Series represents a television series
 type Series struct {
 	BaseModel
-	Name    string   `json:"name"`
-	Status  string   `json:"status"`
-	Network string   `json:"network"`
-	Poster  string   `json:"poster"`
-	TvdbID  int      `json:"tvdbID"`
-	Seasons []Season `json:"seasons"`
+	Name     string   `json:"name"`
+	Status   string   `json:"status"`
+	Network  string   `json:"network"`
+	Poster   string   `json:"poster"`
+	Overview string   `json:"overview"`
+	TvdbID   int      `json:"tvdbID"`
+	Seasons  []Season `json:"seasons"`
 }
 
 // Season represents a season in a series

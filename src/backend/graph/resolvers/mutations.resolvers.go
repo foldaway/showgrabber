@@ -39,11 +39,12 @@ func (r *mutationResolver) SeriesAdd(ctx context.Context, input model.SeriesAddI
 	}
 
 	var series = model.Series{
-		Name:    tvdbSeries.SeriesName,
-		Status:  tvdbSeries.Status,
-		TvdbID:  input.TvdbID,
-		Network: tvdbSeries.Network,
-		Poster:  posterURL,
+		Name:     tvdbSeries.SeriesName,
+		Status:   tvdbSeries.Status,
+		TvdbID:   input.TvdbID,
+		Network:  tvdbSeries.Network,
+		Poster:   posterURL,
+		Overview: tvdbSeries.Overview,
 	}
 
 	err = db.DB.Create(&series).Error
