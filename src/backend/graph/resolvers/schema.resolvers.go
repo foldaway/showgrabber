@@ -29,7 +29,7 @@ func (r *seasonResolver) Number(ctx context.Context, obj *model.Season) (int, er
 
 func (r *seasonResolver) Episodes(ctx context.Context, obj *model.Season) ([]*model.Episode, error) {
 	var dbResults []*model.Episode
-	var err = db.DB.Where(&model.Episode{SeasonID: obj.ID}).Find(&dbResults).Error
+	var err = db.DB.Order("number ASC").Where(&model.Episode{SeasonID: obj.ID}).Find(&dbResults).Error
 
 	return dbResults, err
 }
@@ -40,7 +40,7 @@ func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (int, error)
 
 func (r *seriesResolver) Seasons(ctx context.Context, obj *model.Series) ([]*model.Season, error) {
 	var dbResults []*model.Season
-	var err = db.DB.Where(&model.Season{SeriesID: obj.ID}).Find(&dbResults).Error
+	var err = db.DB.Order("number ASC").Where(&model.Season{SeriesID: obj.ID}).Find(&dbResults).Error
 
 	return dbResults, err
 }
