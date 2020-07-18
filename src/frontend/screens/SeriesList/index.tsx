@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Series from '../../components/Series';
@@ -53,7 +54,9 @@ const SeriesList: React.FC = function () {
       <Title>TV Series</Title>
       <List>
         {data?.series?.map((series) => (
-          <Series key={series.id} series={series} />
+          <Link key={series.id} to={`/series/${series.id}`}>
+            <Series series={series} />
+          </Link>
         ))}
       </List>
     </Wrapper>

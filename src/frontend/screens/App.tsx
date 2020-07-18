@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import Header from '../components/Header';
 import SeriesAdd from './SeriesAdd';
 import SeriesList from './SeriesList';
+import SeriesManage from './SeriesManage';
 
 const Wrapper = styled.div`
   font-family: -apple-system, 'Segoe UI', sans-serif;
@@ -40,6 +41,7 @@ function App() {
           <ContentWrapper>
             <Switch>
               <Route path="/add" component={SeriesAdd} exact />
+              <Route path="/series/:id" component={SeriesManage} />
               <Route path="/" component={SeriesList} />
             </Switch>
           </ContentWrapper>

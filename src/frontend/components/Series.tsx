@@ -50,7 +50,7 @@ const Series: React.FC<Props> = function (props) {
   const { series } = props;
 
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       <ImageContainer>
         <Image src={`https://thetvdb.com/banners/${series.poster}`} />
         <Network>{series.network}</Network>

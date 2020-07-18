@@ -18,6 +18,7 @@ namespace GraphQLTypes {
   }
 
   export interface Episode {
+    id: string;
     title: string;
     number: number;
     airDate: string;
