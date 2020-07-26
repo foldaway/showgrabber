@@ -75,4 +75,51 @@ namespace GraphQLTypes {
     seasonWideImages: TVDBImage[];
     seriesImages: TVDBImage[];
   }
+
+  export interface NewznabComment {
+    title: string;
+    content: string;
+    pub_date: Date;
+  }
+
+  export interface Newznab {
+    id: string;
+    title: string;
+    description: string;
+    size: number;
+    air_date: Date;
+    pub_date: Date;
+    usenet_date: Time;
+    num_grabs: number;
+    num_comments: number;
+    comments: NewznabComment[];
+
+    source_endpoint: string;
+    source_apikey: string;
+    category: string[];
+    info: string;
+    genre: string;
+
+    resolution: string;
+
+    tvdbid: string;
+    tvrageid: string;
+    tvmazeid: string;
+    season: string;
+    episode: string;
+    tvtitle: string;
+    rating: number;
+
+    imdb: string;
+    imdbtitle: string;
+    imdbyear: number;
+    imdbscore: number;
+    coverurl: string;
+
+    seeders: number;
+    peers: number;
+    infohash: string;
+    download_url: string;
+    is_torrent: boolean;
+  }
 }
