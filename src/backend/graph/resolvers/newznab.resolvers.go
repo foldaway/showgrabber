@@ -10,6 +10,14 @@ import (
 	"github.com/mrobinsn/go-newznab/newznab"
 )
 
+func (r *newznabResolver) ID(ctx context.Context, obj *newznab.NZB) (*string, error) {
+	if len(obj.ID) > 0 {
+		return &obj.ID, nil
+	}
+
+	return &obj.Title, nil
+}
+
 func (r *newznabResolver) Imdb(ctx context.Context, obj *newznab.NZB) (*string, error) {
 	var id = obj.IMDBID
 	return &id, nil

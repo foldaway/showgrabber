@@ -78,3 +78,8 @@ models:
         resolver: true
       seriesImages:
         resolver: true
+  Newznab:
+    fields:
+      id:
+        resolver: true
+

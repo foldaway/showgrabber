@@ -232,6 +232,8 @@ type MutationResolver interface {
 	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
 }
 type NewznabResolver interface {
+	ID(ctx context.Context, obj *newznab.NZB) (*string, error)
+
 	Imdb(ctx context.Context, obj *newznab.NZB) (*string, error)
 
 	Imdbscore(ctx context.Context, obj *newznab.NZB) (*float64, error)
@@ -1841,13 +1843,13 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 		Object:   "Newznab",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Newznab().ID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1856,9 +1858,9 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
@@ -7315,7 +7317,16 @@ func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Newznab")
 		case "id":
-			out.Values[i] = ec._Newznab_id(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Newznab_id(ctx, field, obj)
+				return res
+			})
 		case "title":
 			out.Values[i] = ec._Newznab_title(ctx, field, obj)
 		case "description":
