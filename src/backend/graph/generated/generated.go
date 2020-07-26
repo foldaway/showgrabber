@@ -232,8 +232,6 @@ type MutationResolver interface {
 	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
 }
 type NewznabResolver interface {
-	Comments(ctx context.Context, obj *newznab.NZB) ([]*model.NewznabComment, error)
-
 	Imdb(ctx context.Context, obj *newznab.NZB) (*string, error)
 
 	Imdbscore(ctx context.Context, obj *newznab.NZB) (*float64, error)
@@ -2122,13 +2120,13 @@ func (ec *executionContext) _Newznab_comments(ctx context.Context, field graphql
 		Object:   "Newznab",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Newznab().Comments(rctx, obj)
+		return obj.Comments, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2137,9 +2135,9 @@ func (ec *executionContext) _Newznab_comments(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.NewznabComment)
+	res := resTmp.([]newznab.Comment)
 	fc.Result = res
-	return ec.marshalONewznabComment2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx, field.Selections, res)
+	return ec.marshalONewznabComment2ᚕgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Newznab_source_endpoint(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
@@ -2861,7 +2859,7 @@ func (ec *executionContext) _Newznab_is_torrent(ctx context.Context, field graph
 	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NewznabComment_title(ctx context.Context, field graphql.CollectedField, obj *model.NewznabComment) (ret graphql.Marshaler) {
+func (ec *executionContext) _NewznabComment_title(ctx context.Context, field graphql.CollectedField, obj *newznab.Comment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2887,12 +2885,12 @@ func (ec *executionContext) _NewznabComment_title(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NewznabComment_content(ctx context.Context, field graphql.CollectedField, obj *model.NewznabComment) (ret graphql.Marshaler) {
+func (ec *executionContext) _NewznabComment_content(ctx context.Context, field graphql.CollectedField, obj *newznab.Comment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2918,12 +2916,12 @@ func (ec *executionContext) _NewznabComment_content(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _NewznabComment_pub_date(ctx context.Context, field graphql.CollectedField, obj *model.NewznabComment) (ret graphql.Marshaler) {
+func (ec *executionContext) _NewznabComment_pub_date(ctx context.Context, field graphql.CollectedField, obj *newznab.Comment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2949,9 +2947,9 @@ func (ec *executionContext) _NewznabComment_pub_date(ctx context.Context, field 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_series(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7335,16 +7333,7 @@ func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, 
 		case "num_comments":
 			out.Values[i] = ec._Newznab_num_comments(ctx, field, obj)
 		case "comments":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Newznab_comments(ctx, field, obj)
-				return res
-			})
+			out.Values[i] = ec._Newznab_comments(ctx, field, obj)
 		case "source_endpoint":
 			out.Values[i] = ec._Newznab_source_endpoint(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7428,7 +7417,7 @@ func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, 
 
 var newznabCommentImplementors = []string{"NewznabComment"}
 
-func (ec *executionContext) _NewznabComment(ctx context.Context, sel ast.SelectionSet, obj *model.NewznabComment) graphql.Marshaler {
+func (ec *executionContext) _NewznabComment(ctx context.Context, sel ast.SelectionSet, obj *newznab.Comment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, newznabCommentImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -9370,11 +9359,11 @@ func (ec *executionContext) marshalONewznabCategory2ᚖgithubᚗcomᚋbottleneck
 	return v
 }
 
-func (ec *executionContext) marshalONewznabComment2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx context.Context, sel ast.SelectionSet, v model.NewznabComment) graphql.Marshaler {
+func (ec *executionContext) marshalONewznabComment2githubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐComment(ctx context.Context, sel ast.SelectionSet, v newznab.Comment) graphql.Marshaler {
 	return ec._NewznabComment(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalONewznabComment2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx context.Context, sel ast.SelectionSet, v []*model.NewznabComment) graphql.Marshaler {
+func (ec *executionContext) marshalONewznabComment2ᚕgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐComment(ctx context.Context, sel ast.SelectionSet, v []newznab.Comment) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -9401,7 +9390,7 @@ func (ec *executionContext) marshalONewznabComment2ᚕᚖgithubᚗcomᚋbottlene
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalONewznabComment2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx, sel, v[i])
+			ret[i] = ec.marshalONewznabComment2githubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐComment(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9412,13 +9401,6 @@ func (ec *executionContext) marshalONewznabComment2ᚕᚖgithubᚗcomᚋbottlene
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) marshalONewznabComment2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabComment(ctx context.Context, sel ast.SelectionSet, v *model.NewznabComment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._NewznabComment(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOSeason2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeason(ctx context.Context, sel ast.SelectionSet, v model1.Season) graphql.Marshaler {
@@ -9537,21 +9519,6 @@ func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v in
 
 func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
 	return graphql.MarshalTime(v)
-}
-
-func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec.marshalOTime2timeᚐTime(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

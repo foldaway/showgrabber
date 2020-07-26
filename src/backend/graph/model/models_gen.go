@@ -6,16 +6,9 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"time"
 
 	"github.com/bottleneckco/showgrabber/src/backend/model"
 )
-
-type NewznabComment struct {
-	Title   *string    `json:"title"`
-	Content *string    `json:"content"`
-	PubDate *time.Time `json:"pub_date"`
-}
 
 type SeriesAddInput struct {
 	TvdbID int `json:"tvdbID"`
