@@ -40,6 +40,7 @@ const config: webpack.Configuration = {
   ],
   devServer: {
     port: 3001,
+    sockPort: 3000,
     contentBase: path.join(__dirname, 'dist'),
     publicPath: '/',
     hot: true,
