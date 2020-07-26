@@ -1,12 +1,12 @@
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import moment from 'moment';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Episode from '../../components/Episode';
 import Series from '../../components/Series';
+import EpisodeModal from '../../modals/EpisodeModal';
 
 const SERIES_BY_ID = gql`
   query($id: ID!) {
@@ -90,7 +90,19 @@ const SeriesManage: React.FC = function () {
     },
   });
 
+  const [modalEpisode, setModalEpisode] = useState<GraphQLTypes.Episode | null>(
+    null
+  );
+
   const series: GraphQLTypes.Series = data?.seriesByID;
+
+  const handleEpisodeClicked = useCallback((episode: GraphQLTypes.Episode) => {
+    setModalEpisode(episode);
+  }, []);
+
+  const handleModalClosed = useCallback(() => {
+    setModalEpisode(null);
+  }, []);
 
   return (
     <Wrapper>
@@ -103,11 +115,20 @@ const SeriesManage: React.FC = function () {
           <Season key={season.id}>
             <SeasonNumber>Season {season.number}</SeasonNumber>
             {season.episodes.map((episode) => (
-              <Episode key={episode.id} episode={episode} />
+              <Episode
+                key={episode.id}
+                episode={episode}
+                onSearchClicked={handleEpisodeClicked}
+              />
             ))}
           </Season>
         ))}
       </Seasons>
+      <EpisodeModal
+        isOpen={modalEpisode !== null}
+        episode={modalEpisode}
+        onClose={handleModalClosed}
+      />
     </Wrapper>
   );
 };
