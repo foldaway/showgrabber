@@ -12,6 +12,7 @@ services:
       - '3000:3000'
     volumes:
       - './:/app'
+      - '/app/node_modules'
   postgres:
     image: postgres:13-alpine
     environment:
