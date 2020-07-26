@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    env_file:
+      - '.env'
+    environment:
+      - 'TZ=Asia/Singapore'
+      - 'DATABASE_URL=postgres://postgres:postgres@postgres/showgrabber_dev?sslmode=disable'
+    ports:
+      - '3000:3000'
+    volumes:
+      - './:/app'
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_DB=showgrabber_dev'
