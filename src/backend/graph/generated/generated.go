@@ -232,8 +232,6 @@ type MutationResolver interface {
 	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
 }
 type NewznabResolver interface {
-	ID(ctx context.Context, obj *newznab.NZB) (*int, error)
-
 	Comments(ctx context.Context, obj *newznab.NZB) ([]*model.NewznabComment, error)
 
 	Imdb(ctx context.Context, obj *newznab.NZB) (*string, error)
@@ -1312,7 +1310,7 @@ type Mutation {
 # https://gqlgen.com/getting-started/
 
 type Newznab {
-  id: ID
+  id: String 
   title: String
   description: String
   size: Int
@@ -1845,13 +1843,13 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 		Object:   "Newznab",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Newznab().ID(rctx, obj)
+		return obj.ID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1860,9 +1858,9 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOID2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
@@ -7319,16 +7317,7 @@ func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Newznab")
 		case "id":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Newznab_id(ctx, field, obj)
-				return res
-			})
+			out.Values[i] = ec._Newznab_id(ctx, field, obj)
 		case "title":
 			out.Values[i] = ec._Newznab_title(ctx, field, obj)
 		case "description":

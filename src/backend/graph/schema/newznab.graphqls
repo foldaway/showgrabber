@@ -3,7 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 type Newznab {
-  id: ID
+  id: String 
   title: String
   description: String
   size: Int
