@@ -19,8 +19,8 @@ func StartServer() {
 	corsCfg.AllowOrigins = []string{"http://localhost:3000"}
 	r.Use(cors.New(corsCfg))
 
-	r.GET("/graphql", graphQLPlayground)
-	r.POST("/graphql", graphQL)
+	r.Any("/graphql", graphQL)
+	r.Any("/playground", graphQLPlayground)
 
 	if gin.IsDebugging() {
 		// Start webpack-dev-server
