@@ -5,6 +5,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
+import Episode from '../../components/Episode';
 import Series from '../../components/Series';
 
 const SERIES_BY_ID = gql`
@@ -80,29 +81,6 @@ const SeasonNumber = styled.span`
   font-size: 1.2em;
 `;
 
-const Episode = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 10fr 1fr;
-  padding: 6px 0;
-
-  &:hover {
-    background-color: #ddd;
-  }
-`;
-
-const EpisodeNumber = styled.span`
-  font-family: monospace;
-`;
-
-const EpisodeTitle = styled.span`
-  font-size: 0.9em;
-  font-weight: 200;
-`;
-
-const EpisodeAirDate = styled.span`
-  font-family: monospace;
-`;
-
 const SeriesManage: React.FC = function () {
   const { id } = useParams();
 
@@ -125,13 +103,7 @@ const SeriesManage: React.FC = function () {
           <Season key={season.id}>
             <SeasonNumber>Season {season.number}</SeasonNumber>
             {season.episodes.map((episode) => (
-              <Episode key={episode.id}>
-                <EpisodeNumber>{episode.number}</EpisodeNumber>
-                <EpisodeTitle>{episode.title}</EpisodeTitle>
-                <EpisodeAirDate>
-                  {moment(episode.airDate).format('L')}
-                </EpisodeAirDate>
-              </Episode>
+              <Episode key={episode.id} episode={episode} />
             ))}
           </Season>
         ))}
