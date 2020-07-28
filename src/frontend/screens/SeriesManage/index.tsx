@@ -90,10 +90,6 @@ const SeriesManage: React.FC = function () {
     },
   });
 
-  const [modalSeason, setModalSeason] = useState<GraphQLTypes.Season | null>(
-    null
-  );
-
   const [modalEpisode, setModalEpisode] = useState<GraphQLTypes.Episode | null>(
     null
   );
@@ -123,7 +119,6 @@ const SeriesManage: React.FC = function () {
                 key={episode.id}
                 episode={episode}
                 onSearchClicked={(episode) => {
-                  setModalSeason(season);
                   setModalEpisode(episode);
                 }}
               />
@@ -132,9 +127,7 @@ const SeriesManage: React.FC = function () {
         ))}
       </Seasons>
       <EpisodeModal
-        isOpen={modalSeason !== null && modalEpisode !== null}
-        series={series}
-        season={modalSeason}
+        isOpen={modalEpisode !== null}
         episode={modalEpisode}
         onClose={handleModalClosed}
       />
