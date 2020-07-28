@@ -108,6 +108,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		NzbSearch        func(childComplexity int, categories []*model.NewznabCategory, term string) int
+		NzbSearchEpisode func(childComplexity int, categories []*model.NewznabCategory, episodeID int) int
 		Series           func(childComplexity int) int
 		SeriesByID       func(childComplexity int, id *int) int
 		TvdbSeriesSearch func(childComplexity int, term string) int
@@ -243,6 +244,7 @@ type QueryResolver interface {
 	SeriesByID(ctx context.Context, id *int) (*model1.Series, error)
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
 	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*newznab.NZB, error)
+	NzbSearchEpisode(ctx context.Context, categories []*model.NewznabCategory, episodeID int) ([]*newznab.NZB, error)
 }
 type SeasonResolver interface {
 	ID(ctx context.Context, obj *model1.Season) (int, error)
@@ -587,6 +589,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.NzbSearch(childComplexity, args["categories"].([]*model.NewznabCategory), args["term"].(string)), true
+
+	case "Query.nzbSearchEpisode":
+		if e.complexity.Query.NzbSearchEpisode == nil {
+			break
+		}
+
+		args, err := ec.field_Query_nzbSearchEpisode_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.NzbSearchEpisode(childComplexity, args["categories"].([]*model.NewznabCategory), args["episodeID"].(int)), true
 
 	case "Query.series":
 		if e.complexity.Query.Series == nil {
@@ -1385,6 +1399,7 @@ type Query {
   tvdbSeriesSearch(term: String!): [TVDBSeries]!
 
   nzbSearch(categories: [NewznabCategory]!, term: String!): [Newznab]!
+  nzbSearchEpisode(categories: [NewznabCategory], episodeID: ID!): [Newznab]!
 }
 
 `, BuiltIn: false},
@@ -1552,6 +1567,28 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_nzbSearchEpisode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.NewznabCategory
+	if tmp, ok := rawArgs["categories"]; ok {
+		arg0, err = ec.unmarshalONewznabCategory2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categories"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["episodeID"]; ok {
+		arg1, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["episodeID"] = arg1
 	return args, nil
 }
 
@@ -3095,6 +3132,47 @@ func (ec *executionContext) _Query_nzbSearch(ctx context.Context, field graphql.
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().NzbSearch(rctx, args["categories"].([]*model.NewznabCategory), args["term"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*newznab.NZB)
+	fc.Result = res
+	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_nzbSearchEpisode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_nzbSearchEpisode_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().NzbSearchEpisode(rctx, args["categories"].([]*model.NewznabCategory), args["episodeID"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7525,6 +7603,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "nzbSearchEpisode":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_nzbSearchEpisode(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -9353,6 +9445,66 @@ func (ec *executionContext) unmarshalONewznabCategory2githubᚗcomᚋbottleneckc
 
 func (ec *executionContext) marshalONewznabCategory2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, sel ast.SelectionSet, v model.NewznabCategory) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalONewznabCategory2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, v interface{}) ([]*model.NewznabCategory, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.NewznabCategory, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalONewznabCategory2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, sel ast.SelectionSet, v []*model.NewznabCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) unmarshalONewznabCategory2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznabCategory(ctx context.Context, v interface{}) (*model.NewznabCategory, error) {

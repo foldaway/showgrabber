@@ -5,6 +5,8 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
@@ -48,6 +50,57 @@ func (r *queryResolver) NzbSearch(ctx context.Context, categories []*graphModel.
 	nzbResults, err := newznabClient.SearchWithQuery(convertNZBCategories(categories), term, "search")
 
 	for _, nzbResult := range nzbResults {
+		var result = nzbResult
+		results = append(results, &result)
+	}
+
+	return results, err
+}
+
+func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*graphModel.NewznabCategory, episodeID int) ([]*newznab.NZB, error) {
+	var cat = categories
+	if cat == nil {
+		var tvAll = graphModel.NewznabCategoryTvAll
+		cat = []*graphModel.NewznabCategory{&tvAll}
+	}
+
+	var ep model.Episode
+	var results []*newznab.NZB
+
+	var err = db.DB.First(&ep, episodeID).Error
+
+	if err != nil {
+		return results, err
+	}
+
+	err = db.DB.Model(&ep).Related(&ep.Season).Error
+	if err != nil {
+		return results, err
+	}
+
+	err = db.DB.Model(&ep.Season).Related(&ep.Season.Series).Error
+	if err != nil {
+		return results, err
+	}
+
+	var temp []newznab.NZB
+	var newznabCats = convertNZBCategories(cat)
+	var searchTerm = ""
+
+	searchTerm = fmt.Sprintf("%s S%02dE%02d", ep.Season.Series.Name, ep.Season.Number, ep.Number)
+	temp, err = newznabClient.SearchWithQuery(newznabCats, searchTerm, "search")
+	log.Printf("[NEWZNAB] Search '%s', %d results, error: %+v\n", searchTerm, len(temp), err)
+
+	for _, nzbResult := range temp {
+		var result = nzbResult
+		results = append(results, &result)
+	}
+
+	searchTerm = fmt.Sprintf("%s %s", ep.Season.Series.Name, ep.Title)
+	temp, err = newznabClient.SearchWithQuery(newznabCats, searchTerm, "search")
+	log.Printf("[NEWZNAB] Search '%s', %d results, error: %+v\n", searchTerm, len(temp), err)
+
+	for _, nzbResult := range temp {
 		var result = nzbResult
 		results = append(results, &result)
 	}
