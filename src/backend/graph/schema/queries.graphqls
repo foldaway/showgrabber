@@ -9,5 +9,7 @@ type Query {
 
   nzbSearch(categories: [NewznabCategory]!, term: String!): [Newznab]!
   nzbSearchEpisode(categories: [NewznabCategory], episodeID: ID!): [Newznab]!
+
+  languages: [Language]!
 }
 

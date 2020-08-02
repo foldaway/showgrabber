@@ -108,6 +108,12 @@ func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*grap
 	return results, err
 }
 
+func (r *queryResolver) Languages(ctx context.Context) ([]*model.Language, error) {
+	var results []*model.Language
+	var err = db.DB.Model(&model.Language{}).Find(&results).Error
+	return results, err
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 

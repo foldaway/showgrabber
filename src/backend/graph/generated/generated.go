@@ -60,6 +60,13 @@ type ComplexityRoot struct {
 		Title   func(childComplexity int) int
 	}
 
+	Language struct {
+		Abbreviation func(childComplexity int) int
+		EnglishName  func(childComplexity int) int
+		Name         func(childComplexity int) int
+		TVDBID       func(childComplexity int) int
+	}
+
 	Mutation struct {
 		SeriesAdd func(childComplexity int, input model.SeriesAddInput) int
 	}
@@ -107,6 +114,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Languages        func(childComplexity int) int
 		NzbSearch        func(childComplexity int, categories []*model.NewznabCategory, term string) int
 		NzbSearchEpisode func(childComplexity int, categories []*model.NewznabCategory, episodeID int) int
 		Series           func(childComplexity int) int
@@ -245,6 +253,7 @@ type QueryResolver interface {
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
 	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*newznab.NZB, error)
 	NzbSearchEpisode(ctx context.Context, categories []*model.NewznabCategory, episodeID int) ([]*newznab.NZB, error)
+	Languages(ctx context.Context) ([]*model1.Language, error)
 }
 type SeasonResolver interface {
 	ID(ctx context.Context, obj *model1.Season) (int, error)
@@ -313,6 +322,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Episode.Title(childComplexity), true
+
+	case "Language.abbreviation":
+		if e.complexity.Language.Abbreviation == nil {
+			break
+		}
+
+		return e.complexity.Language.Abbreviation(childComplexity), true
+
+	case "Language.englishName":
+		if e.complexity.Language.EnglishName == nil {
+			break
+		}
+
+		return e.complexity.Language.EnglishName(childComplexity), true
+
+	case "Language.name":
+		if e.complexity.Language.Name == nil {
+			break
+		}
+
+		return e.complexity.Language.Name(childComplexity), true
+
+	case "Language.tvdbID":
+		if e.complexity.Language.TVDBID == nil {
+			break
+		}
+
+		return e.complexity.Language.TVDBID(childComplexity), true
 
 	case "Mutation.seriesAdd":
 		if e.complexity.Mutation.SeriesAdd == nil {
@@ -577,6 +614,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NewznabComment.Title(childComplexity), true
+
+	case "Query.languages":
+		if e.complexity.Query.Languages == nil {
+			break
+		}
+
+		return e.complexity.Query.Languages(childComplexity), true
 
 	case "Query.nzbSearch":
 		if e.complexity.Query.NzbSearch == nil {
@@ -1400,6 +1444,8 @@ type Query {
 
   nzbSearch(categories: [NewznabCategory]!, term: String!): [Newznab]!
   nzbSearchEpisode(categories: [NewznabCategory], episodeID: ID!): [Newznab]!
+
+  languages: [Language]!
 }
 
 `, BuiltIn: false},
@@ -1524,6 +1570,13 @@ type TVDBSeries {
 
   summary: TVDBSeriesSummary!
   episodes(season: Int): [TVDBEpisode]!
+}
+
+type Language {
+  abbreviation: String!
+  englishName: String!
+  tvdbID: Int!
+  name: String!
 }
 
 input SeriesAddInput {
@@ -1826,6 +1879,142 @@ func (ec *executionContext) _Episode_airDate(ctx context.Context, field graphql.
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Language_abbreviation(ctx context.Context, field graphql.CollectedField, obj *model1.Language) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Language",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Abbreviation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Language_englishName(ctx context.Context, field graphql.CollectedField, obj *model1.Language) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Language",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EnglishName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Language_tvdbID(ctx context.Context, field graphql.CollectedField, obj *model1.Language) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Language",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TVDBID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Language_name(ctx context.Context, field graphql.CollectedField, obj *model1.Language) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Language",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_seriesAdd(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3187,6 +3376,40 @@ func (ec *executionContext) _Query_nzbSearchEpisode(ctx context.Context, field g
 	res := resTmp.([]*newznab.NZB)
 	fc.Result = res
 	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_languages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Languages(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model1.Language)
+	fc.Result = res
+	return ec.marshalNLanguage2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7352,6 +7575,48 @@ func (ec *executionContext) _Episode(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var languageImplementors = []string{"Language"}
+
+func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet, obj *model1.Language) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, languageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Language")
+		case "abbreviation":
+			out.Values[i] = ec._Language_abbreviation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "englishName":
+			out.Values[i] = ec._Language_englishName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tvdbID":
+			out.Values[i] = ec._Language_tvdbID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Language_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -7612,6 +7877,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_nzbSearchEpisode(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "languages":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_languages(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -8704,6 +8983,43 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) marshalNLanguage2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx context.Context, sel ast.SelectionSet, v []*model1.Language) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOLanguage2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v []*newznab.NZB) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -9425,6 +9741,17 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return ec.marshalOInt2int(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOLanguage2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx context.Context, sel ast.SelectionSet, v model1.Language) graphql.Marshaler {
+	return ec._Language(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOLanguage2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx context.Context, sel ast.SelectionSet, v *model1.Language) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Language(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalONewznab2githubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v newznab.NZB) graphql.Marshaler {

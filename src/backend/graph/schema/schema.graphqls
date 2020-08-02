@@ -119,6 +119,13 @@ type TVDBSeries {
   episodes(season: Int): [TVDBEpisode]!
 }
 
+type Language {
+  abbreviation: String!
+  englishName: String!
+  tvdbID: Int!
+  name: String!
+}
+
 input SeriesAddInput {
   tvdbID: Int!
 }
