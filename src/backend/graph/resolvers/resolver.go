@@ -5,9 +5,9 @@ import (
 	"os"
 
 	graphModel "github.com/bottleneckco/showgrabber/src/backend/graph/model"
+	"github.com/bottleneckco/showgrabber/src/backend/util"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/mrobinsn/go-newznab/newznab"
-	"github.com/pioz/tvdb"
 )
 
 // This file will not be regenerated automatically.
@@ -15,18 +15,10 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 var (
-	TVDB_API_KEY     = os.Getenv("TVDB_API_KEY")
-	TVDB_USER_KEY    = os.Getenv("TVDB_USER_KEY")
-	TVDB_USER_NAME   = os.Getenv("TVDB_USER_NAME")
 	NEWZNAB_BASE_URL = os.Getenv("NEWZNAB_BASE_URL")
 	NEWZNAB_API_KEY  = os.Getenv("NEWZNAB_API_KEY")
 
-	tvdbClient = tvdb.Client{
-		Apikey:   TVDB_API_KEY,
-		Userkey:  TVDB_USER_KEY,
-		Username: TVDB_USER_NAME,
-	}
-
+	tvdbClient    = util.CreateTVDBClient()
 	newznabClient = newznab.New(NEWZNAB_BASE_URL, NEWZNAB_API_KEY, 1, true)
 )
 

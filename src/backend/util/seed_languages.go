@@ -1,26 +1,12 @@
 package util
 
 import (
-	"os"
-
 	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/model"
-	"github.com/pioz/tvdb"
-)
-
-var (
-	TVDB_API_KEY   = os.Getenv("TVDB_API_KEY")
-	TVDB_USER_KEY  = os.Getenv("TVDB_USER_KEY")
-	TVDB_USER_NAME = os.Getenv("TVDB_USER_NAME")
-
-	tvdbClient = tvdb.Client{
-		Apikey:   TVDB_API_KEY,
-		Userkey:  TVDB_USER_KEY,
-		Username: TVDB_USER_NAME,
-	}
 )
 
 func SeedLanguages() error {
+	var tvdbClient = CreateTVDBClient()
 	languages, err := tvdbClient.GetLanguages()
 	if err != nil {
 		return err
