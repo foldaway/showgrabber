@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -34,6 +34,22 @@ const SERIES_BY_ID = gql`
           title
           number
           airDate
+        }
+      }
+    }
+  }
+`;
+
+const SERIES_UPDATE_LANGUAGE = gql`
+  mutation($input: SeriesUpdateLanguageInput!) {
+    seriesUpdateLanguage(input: $input) {
+      ok
+      series {
+        id
+        name
+        overview
+        language {
+          id
         }
       }
     }
@@ -114,6 +130,8 @@ const SeriesManage: React.FC = function () {
 
   const { data: languagesData } = useQuery(LANGUAGES);
 
+  const [seriesUpdateLanguage] = useMutation(SERIES_UPDATE_LANGUAGE);
+
   const [modalEpisode, setModalEpisode] = useState<GraphQLTypes.Episode | null>(
     null
   );
@@ -128,18 +146,37 @@ const SeriesManage: React.FC = function () {
     setModalEpisode(null);
   }, []);
 
+  const handleLanguageSelected = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const languageID = parseInt(e.target.value, 10);
+
+      seriesUpdateLanguage({
+        variables: {
+          input: {
+            seriesID: series.id,
+            languageID,
+          },
+        },
+      });
+    },
+    [series, seriesUpdateLanguage]
+  );
+
   return (
     <Wrapper>
       {series && <StyledSeries series={series} />}
       <Metadata>
         <Overview>{series?.overview}</Overview>
-        <LanguageSelect value={series?.language?.id}>
+        <LanguageSelect
+          value={series?.language?.id}
+          onChange={handleLanguageSelected}
+        >
           <option disabled selected>
             Not set, default to English
           </option>
           {languagesData?.languages?.map((lang: GraphQLTypes.Language) => (
             <option key={lang.id} value={lang.id}>
-              {lang.name} ({lang.englishName})
+              {lang.englishName} ({lang.name})
             </option>
           ))}
         </LanguageSelect>

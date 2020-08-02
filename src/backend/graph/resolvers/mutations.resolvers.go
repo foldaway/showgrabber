@@ -14,6 +14,7 @@ import (
 	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
+	"github.com/bottleneckco/showgrabber/src/backend/util"
 	"github.com/pioz/tvdb"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 )
@@ -131,7 +132,25 @@ func (r *mutationResolver) SeriesUpdateLanguage(ctx context.Context, input model
 		return nil, err
 	}
 
-	err = db.DB.Model(&series).Updates(model.Series{LanguageID: language.ID}).Error
+	var tempTVDBClient = util.CreateTVDBClient()
+	tempTVDBClient.Language = language.Abbreviation
+
+	var tvdbSeries = &tvdb.Series{
+		ID: series.TvdbID,
+	}
+	err = tempTVDBClient.GetSeries(tvdbSeries)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.DB.
+		Model(&series).
+		Updates(model.Series{
+			LanguageID: language.ID,
+			Name:       tvdbSeries.SeriesName,
+			Overview:   tvdbSeries.Overview,
+		}).
+		Error
 	if err != nil {
 		return nil, err
 	}
