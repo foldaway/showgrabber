@@ -22,6 +22,15 @@ const NEWZNAB_SEARCH = gql`
       download_url
       seeders
       peers
+
+      parsed {
+        season_number
+        episode_number
+        video_codec
+        audio_codec
+        resolution
+        scene_name
+      }
     }
   }
 `;

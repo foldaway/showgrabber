@@ -77,6 +77,15 @@ namespace GraphQLTypes {
     seriesImages: TVDBImage[];
   }
 
+  export interface ParsedMetadata {
+    season_number?: number;
+    episode_number?: number;
+    video_codec?: string;
+    audio_codec?: string;
+    resolution?: string;
+    scene_name?: string;
+  }
+
   export interface NewznabComment {
     title: string;
     content: string;
@@ -122,6 +131,8 @@ namespace GraphQLTypes {
     infohash: string;
     download_url: string;
     is_torrent: boolean;
+
+    parsed: ParsedMetadata | null;
   }
 
   export interface Language {
