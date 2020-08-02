@@ -30,6 +30,11 @@ const CloseButton = styled.button``;
 
 const SearchButton = styled.button``;
 
+const ResultsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const EpisodeModal: React.FC<Props> = function (props) {
   const { episode, onClose } = props;
 
@@ -50,7 +55,7 @@ const EpisodeModal: React.FC<Props> = function (props) {
       <SearchButton onClick={() => searchNewznab()}>
         Search for episodes
       </SearchButton>
-      <div>
+      <ResultsContainer>
         {data?.nzbSearchEpisode?.map((newznab: GraphQLTypes.Newznab) => (
           <Newznab key={newznab.title} newznab={newznab} />
         ))}
@@ -59,7 +64,7 @@ const EpisodeModal: React.FC<Props> = function (props) {
         )}
         {loading && <span>Loading</span>}
         {error && <span>{error}</span>}
-      </div>
+      </ResultsContainer>
     </Modal>
   );
 };
