@@ -17,6 +17,14 @@ const SERIES_BY_ID = gql`
       poster
       overview
 
+      language {
+        id
+        abbreviation
+        englishName
+        name
+        tvdbID
+      }
+
       seasons {
         id
         number
@@ -28,6 +36,18 @@ const SERIES_BY_ID = gql`
           airDate
         }
       }
+    }
+  }
+`;
+
+const LANGUAGES = gql`
+  query {
+    languages {
+      id
+      abbreviation
+      englishName
+      tvdbID
+      name
     }
   }
 `;
@@ -81,6 +101,8 @@ const SeasonNumber = styled.span`
   font-size: 1.2em;
 `;
 
+const LanguageSelect = styled.select``;
+
 const SeriesManage: React.FC = function () {
   const { id } = useParams();
 
@@ -89,6 +111,8 @@ const SeriesManage: React.FC = function () {
       id,
     },
   });
+
+  const { data: languagesData } = useQuery(LANGUAGES);
 
   const [modalEpisode, setModalEpisode] = useState<GraphQLTypes.Episode | null>(
     null
@@ -109,6 +133,16 @@ const SeriesManage: React.FC = function () {
       {series && <StyledSeries series={series} />}
       <Metadata>
         <Overview>{series?.overview}</Overview>
+        <LanguageSelect value={series?.language?.id}>
+          <option disabled selected>
+            Not set, default to English
+          </option>
+          {languagesData?.languages?.map((lang: GraphQLTypes.Language) => (
+            <option key={lang.id} value={lang.id}>
+              {lang.name} ({lang.englishName})
+            </option>
+          ))}
+        </LanguageSelect>
       </Metadata>
       <Seasons>
         {series?.seasons?.map((season) => (
