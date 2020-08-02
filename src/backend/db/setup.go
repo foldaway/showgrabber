@@ -34,6 +34,7 @@ func init() {
 	)
 
 	// Custom setup
+	DB.Model(&model.Series{}).AddForeignKey("language_id", "language(id)", "CASCADE", "RESTRICT")
 	DB.Model(&model.Season{}).AddForeignKey("series_id", "series(id)", "CASCADE", "RESTRICT")
 	DB.Model(&model.Episode{}).AddForeignKey("season_id", "seasons(id)", "CASCADE", "RESTRICT")
 }

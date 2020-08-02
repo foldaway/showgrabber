@@ -130,6 +130,7 @@ type ComplexityRoot struct {
 
 	Series struct {
 		ID       func(childComplexity int) int
+		Language func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Network  func(childComplexity int) int
 		Overview func(childComplexity int) int
@@ -704,6 +705,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Series.ID(childComplexity), true
+
+	case "Series.language":
+		if e.complexity.Series.Language == nil {
+			break
+		}
+
+		return e.complexity.Series.Language(childComplexity), true
 
 	case "Series.name":
 		if e.complexity.Series.Name == nil {
@@ -1463,6 +1471,7 @@ type Series {
   poster: String!
   tvdbID: Int!
   overview: String!
+  language: Language
 
   seasons: [Season]!
 }
@@ -3819,6 +3828,37 @@ func (ec *executionContext) _Series_overview(ctx context.Context, field graphql.
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Series_language(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Series",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Language, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model1.Language)
+	fc.Result = res
+	return ec.marshalOLanguage2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Series_seasons(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
@@ -8030,6 +8070,8 @@ func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "language":
+			out.Values[i] = ec._Series_language(ctx, field, obj)
 		case "seasons":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {

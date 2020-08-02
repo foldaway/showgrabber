@@ -7,6 +7,7 @@ namespace GraphQLTypes {
     poster: string;
     tvdbID: number;
     overview: string;
+    language: Language;
 
     seasons: Season[];
   }
@@ -121,5 +122,12 @@ namespace GraphQLTypes {
     infohash: string;
     download_url: string;
     is_torrent: boolean;
+  }
+
+  export interface Language {
+    abbreviation: string;
+    englishName: string;
+    tvdbID: number;
+    name: string;
   }
 }
