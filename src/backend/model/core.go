@@ -39,3 +39,11 @@ type EpisodeFile struct {
 	Episode   Episode
 	FilePath  string `json:"file_path"`
 }
+
+// Language supported languages in TVDB
+type Language struct {
+	Abbreviation string `json:"abbreviation"`
+	EnglishName  string `json:"englishName"`
+	TVDBID       int    `json:"tvdbID"`
+	Name         string `json:"name"`
+}

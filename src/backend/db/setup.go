@@ -30,6 +30,7 @@ func init() {
 		&model.Episode{},
 		&model.EpisodeFile{},
 		&model.FetchJob{},
+		&model.Language{},
 	)
 
 	// Custom setup
