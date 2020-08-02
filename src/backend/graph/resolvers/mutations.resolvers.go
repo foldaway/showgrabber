@@ -117,6 +117,28 @@ func (r *mutationResolver) SeriesAdd(ctx context.Context, input model.SeriesAddI
 	return &result, err
 }
 
+func (r *mutationResolver) SeriesUpdateLanguage(ctx context.Context, input model.SeriesUpdateLanguageInput) (*model.SeriesUpdateLanguagePayload, error) {
+	var language model.Language
+	var err = db.DB.First(&language, input.LanguageID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var series model.Series
+	err = db.DB.First(&series, input.SeriesID).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.DB.Model(&series).Updates(model.Series{LanguageID: language.ID}).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.SeriesUpdateLanguagePayload{Ok: true, Series: &series}, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

@@ -4,4 +4,5 @@
 
 type Mutation {
   seriesAdd(input: SeriesAddInput!): SeriesAddPayload!
+  seriesUpdateLanguage(input: SeriesUpdateLanguageInput!): SeriesUpdateLanguagePayload!
 }

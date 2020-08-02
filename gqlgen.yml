@@ -58,6 +58,8 @@ models:
     fields:
       seasons:
         resolver: true
+      language:
+        resolver: true
   Season:
     fields:
       episodes:

@@ -125,6 +125,7 @@ namespace GraphQLTypes {
   }
 
   export interface Language {
+    id: number;
     abbreviation: string;
     englishName: string;
     tvdbID: number;

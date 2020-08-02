@@ -19,6 +19,16 @@ type SeriesAddPayload struct {
 	Series *model.Series `json:"series"`
 }
 
+type SeriesUpdateLanguageInput struct {
+	SeriesID   int `json:"seriesID"`
+	LanguageID int `json:"languageID"`
+}
+
+type SeriesUpdateLanguagePayload struct {
+	Ok     bool          `json:"ok"`
+	Series *model.Series `json:"series"`
+}
+
 type NewznabCategory string
 
 const (

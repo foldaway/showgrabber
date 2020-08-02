@@ -40,6 +40,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Episode() EpisodeResolver
+	Language() LanguageResolver
 	Mutation() MutationResolver
 	Newznab() NewznabResolver
 	Query() QueryResolver
@@ -63,12 +64,14 @@ type ComplexityRoot struct {
 	Language struct {
 		Abbreviation func(childComplexity int) int
 		EnglishName  func(childComplexity int) int
+		ID           func(childComplexity int) int
 		Name         func(childComplexity int) int
 		TVDBID       func(childComplexity int) int
 	}
 
 	Mutation struct {
-		SeriesAdd func(childComplexity int, input model.SeriesAddInput) int
+		SeriesAdd            func(childComplexity int, input model.SeriesAddInput) int
+		SeriesUpdateLanguage func(childComplexity int, input model.SeriesUpdateLanguageInput) int
 	}
 
 	Newznab struct {
@@ -141,6 +144,11 @@ type ComplexityRoot struct {
 	}
 
 	SeriesAddPayload struct {
+		Ok     func(childComplexity int) int
+		Series func(childComplexity int) int
+	}
+
+	SeriesUpdateLanguagePayload struct {
 		Ok     func(childComplexity int) int
 		Series func(childComplexity int) int
 	}
@@ -238,8 +246,12 @@ type ComplexityRoot struct {
 type EpisodeResolver interface {
 	ID(ctx context.Context, obj *model1.Episode) (int, error)
 }
+type LanguageResolver interface {
+	ID(ctx context.Context, obj *model1.Language) (int, error)
+}
 type MutationResolver interface {
 	SeriesAdd(ctx context.Context, input model.SeriesAddInput) (*model.SeriesAddPayload, error)
+	SeriesUpdateLanguage(ctx context.Context, input model.SeriesUpdateLanguageInput) (*model.SeriesUpdateLanguagePayload, error)
 }
 type NewznabResolver interface {
 	ID(ctx context.Context, obj *newznab.NZB) (*string, error)
@@ -264,6 +276,7 @@ type SeasonResolver interface {
 type SeriesResolver interface {
 	ID(ctx context.Context, obj *model1.Series) (int, error)
 
+	Language(ctx context.Context, obj *model1.Series) (*model1.Language, error)
 	Seasons(ctx context.Context, obj *model1.Series) ([]*model1.Season, error)
 }
 type TVDBEpisodeResolver interface {
@@ -338,6 +351,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Language.EnglishName(childComplexity), true
 
+	case "Language.id":
+		if e.complexity.Language.ID == nil {
+			break
+		}
+
+		return e.complexity.Language.ID(childComplexity), true
+
 	case "Language.name":
 		if e.complexity.Language.Name == nil {
 			break
@@ -363,6 +383,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SeriesAdd(childComplexity, args["input"].(model.SeriesAddInput)), true
+
+	case "Mutation.seriesUpdateLanguage":
+		if e.complexity.Mutation.SeriesUpdateLanguage == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_seriesUpdateLanguage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SeriesUpdateLanguage(childComplexity, args["input"].(model.SeriesUpdateLanguageInput)), true
 
 	case "Newznab.air_date":
 		if e.complexity.Newznab.AirDate == nil {
@@ -775,6 +807,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SeriesAddPayload.Series(childComplexity), true
+
+	case "SeriesUpdateLanguagePayload.ok":
+		if e.complexity.SeriesUpdateLanguagePayload.Ok == nil {
+			break
+		}
+
+		return e.complexity.SeriesUpdateLanguagePayload.Ok(childComplexity), true
+
+	case "SeriesUpdateLanguagePayload.series":
+		if e.complexity.SeriesUpdateLanguagePayload.Series == nil {
+			break
+		}
+
+		return e.complexity.SeriesUpdateLanguagePayload.Series(childComplexity), true
 
 	case "TVDBEpisode.absoluteNumber":
 		if e.complexity.TVDBEpisode.AbsoluteNumber == nil {
@@ -1369,6 +1415,7 @@ var sources = []*ast.Source{
 
 type Mutation {
   seriesAdd(input: SeriesAddInput!): SeriesAddPayload!
+  seriesUpdateLanguage(input: SeriesUpdateLanguageInput!): SeriesUpdateLanguagePayload!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "src/backend/graph/schema/newznab.graphqls", Input: `# GraphQL schema example
@@ -1582,6 +1629,7 @@ type TVDBSeries {
 }
 
 type Language {
+  id: ID!
   abbreviation: String!
   englishName: String!
   tvdbID: Int!
@@ -1593,6 +1641,16 @@ input SeriesAddInput {
 }
 
 type SeriesAddPayload {
+  ok: Boolean!
+  series: Series!
+}
+
+input SeriesUpdateLanguageInput {
+  seriesID: ID!
+  languageID: ID!
+}
+
+type SeriesUpdateLanguagePayload {
   ok: Boolean!
   series: Series!
 }
@@ -1610,6 +1668,20 @@ func (ec *executionContext) field_Mutation_seriesAdd_args(ctx context.Context, r
 	var arg0 model.SeriesAddInput
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNSeriesAddInput2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_seriesUpdateLanguage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.SeriesUpdateLanguageInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNSeriesUpdateLanguageInput2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesUpdateLanguageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1890,6 +1962,40 @@ func (ec *executionContext) _Episode_airDate(ctx context.Context, field graphql.
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Language_id(ctx context.Context, field graphql.CollectedField, obj *model1.Language) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Language",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Language().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Language_abbreviation(ctx context.Context, field graphql.CollectedField, obj *model1.Language) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2065,6 +2171,47 @@ func (ec *executionContext) _Mutation_seriesAdd(ctx context.Context, field graph
 	res := resTmp.(*model.SeriesAddPayload)
 	fc.Result = res
 	return ec.marshalNSeriesAddPayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesAddPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_seriesUpdateLanguage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_seriesUpdateLanguage_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SeriesUpdateLanguage(rctx, args["input"].(model.SeriesUpdateLanguageInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SeriesUpdateLanguagePayload)
+	fc.Result = res
+	return ec.marshalNSeriesUpdateLanguagePayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesUpdateLanguagePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
@@ -3841,13 +3988,13 @@ func (ec *executionContext) _Series_language(ctx context.Context, field graphql.
 		Object:   "Series",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Language, nil
+		return ec.resolvers.Series().Language(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3856,9 +4003,9 @@ func (ec *executionContext) _Series_language(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model1.Language)
+	res := resTmp.(*model1.Language)
 	fc.Result = res
-	return ec.marshalOLanguage2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx, field.Selections, res)
+	return ec.marshalOLanguage2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐLanguage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Series_seasons(ctx context.Context, field graphql.CollectedField, obj *model1.Series) (ret graphql.Marshaler) {
@@ -3938,6 +4085,74 @@ func (ec *executionContext) _SeriesAddPayload_series(ctx context.Context, field 
 	}()
 	fc := &graphql.FieldContext{
 		Object:   "SeriesAddPayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Series, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model1.Series)
+	fc.Result = res
+	return ec.marshalNSeries2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeries(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SeriesUpdateLanguagePayload_ok(ctx context.Context, field graphql.CollectedField, obj *model.SeriesUpdateLanguagePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SeriesUpdateLanguagePayload",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ok, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SeriesUpdateLanguagePayload_series(ctx context.Context, field graphql.CollectedField, obj *model.SeriesUpdateLanguagePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SeriesUpdateLanguagePayload",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -7556,6 +7771,30 @@ func (ec *executionContext) unmarshalInputSeriesAddInput(ctx context.Context, ob
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSeriesUpdateLanguageInput(ctx context.Context, obj interface{}) (model.SeriesUpdateLanguageInput, error) {
+	var it model.SeriesUpdateLanguageInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "seriesID":
+			var err error
+			it.SeriesID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "languageID":
+			var err error
+			it.LanguageID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -7626,25 +7865,39 @@ func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Language")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Language_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "abbreviation":
 			out.Values[i] = ec._Language_abbreviation(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "englishName":
 			out.Values[i] = ec._Language_englishName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "tvdbID":
 			out.Values[i] = ec._Language_tvdbID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Language_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -7674,6 +7927,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "seriesAdd":
 			out.Values[i] = ec._Mutation_seriesAdd(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "seriesUpdateLanguage":
+			out.Values[i] = ec._Mutation_seriesUpdateLanguage(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -8071,7 +8329,16 @@ func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, o
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "language":
-			out.Values[i] = ec._Series_language(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Series_language(ctx, field, obj)
+				return res
+			})
 		case "seasons":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -8115,6 +8382,38 @@ func (ec *executionContext) _SeriesAddPayload(ctx context.Context, sel ast.Selec
 			}
 		case "series":
 			out.Values[i] = ec._SeriesAddPayload_series(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var seriesUpdateLanguagePayloadImplementors = []string{"SeriesUpdateLanguagePayload"}
+
+func (ec *executionContext) _SeriesUpdateLanguagePayload(ctx context.Context, sel ast.SelectionSet, obj *model.SeriesUpdateLanguagePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, seriesUpdateLanguagePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SeriesUpdateLanguagePayload")
+		case "ok":
+			out.Values[i] = ec._SeriesUpdateLanguagePayload_ok(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "series":
+			out.Values[i] = ec._SeriesUpdateLanguagePayload_series(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9260,6 +9559,24 @@ func (ec *executionContext) marshalNSeriesAddPayload2ᚖgithubᚗcomᚋbottlenec
 		return graphql.Null
 	}
 	return ec._SeriesAddPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSeriesUpdateLanguageInput2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesUpdateLanguageInput(ctx context.Context, v interface{}) (model.SeriesUpdateLanguageInput, error) {
+	return ec.unmarshalInputSeriesUpdateLanguageInput(ctx, v)
+}
+
+func (ec *executionContext) marshalNSeriesUpdateLanguagePayload2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesUpdateLanguagePayload(ctx context.Context, sel ast.SelectionSet, v model.SeriesUpdateLanguagePayload) graphql.Marshaler {
+	return ec._SeriesUpdateLanguagePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSeriesUpdateLanguagePayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesUpdateLanguagePayload(ctx context.Context, sel ast.SelectionSet, v *model.SeriesUpdateLanguagePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SeriesUpdateLanguagePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

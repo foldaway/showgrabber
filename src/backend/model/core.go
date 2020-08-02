@@ -44,6 +44,7 @@ type EpisodeFile struct {
 
 // Language supported languages in TVDB
 type Language struct {
+	BaseModel
 	Abbreviation string `json:"abbreviation"`
 	EnglishName  string `json:"englishName"`
 	TVDBID       int    `json:"tvdbID"`

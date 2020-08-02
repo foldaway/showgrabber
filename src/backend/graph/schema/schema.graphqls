@@ -121,6 +121,7 @@ type TVDBSeries {
 }
 
 type Language {
+  id: ID!
   abbreviation: String!
   englishName: String!
   tvdbID: Int!
@@ -132,6 +133,16 @@ input SeriesAddInput {
 }
 
 type SeriesAddPayload {
+  ok: Boolean!
+  series: Series!
+}
+
+input SeriesUpdateLanguageInput {
+  seriesID: ID!
+  languageID: ID!
+}
+
+type SeriesUpdateLanguagePayload {
   ok: Boolean!
   series: Series!
 }

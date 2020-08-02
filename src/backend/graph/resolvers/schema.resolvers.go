@@ -12,10 +12,15 @@ import (
 	"github.com/bottleneckco/showgrabber/src/backend/db"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
 	"github.com/bottleneckco/showgrabber/src/backend/model"
+	"github.com/jinzhu/gorm"
 	"github.com/pioz/tvdb"
 )
 
 func (r *episodeResolver) ID(ctx context.Context, obj *model.Episode) (int, error) {
+	return int(obj.ID), nil
+}
+
+func (r *languageResolver) ID(ctx context.Context, obj *model.Language) (int, error) {
 	return int(obj.ID), nil
 }
 
@@ -36,6 +41,17 @@ func (r *seasonResolver) Episodes(ctx context.Context, obj *model.Season) ([]*mo
 
 func (r *seriesResolver) ID(ctx context.Context, obj *model.Series) (int, error) {
 	return int(obj.ID), nil
+}
+
+func (r *seriesResolver) Language(ctx context.Context, obj *model.Series) (*model.Language, error) {
+	var language model.Language
+	var err = db.DB.First(&language, int(obj.LanguageID)).Error
+
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, nil
+	}
+
+	return &language, err
 }
 
 func (r *seriesResolver) Seasons(ctx context.Context, obj *model.Series) ([]*model.Season, error) {
@@ -181,6 +197,9 @@ func (r *tVDBSeriesResolver) Episodes(ctx context.Context, obj *tvdb.Series, sea
 // Episode returns generated.EpisodeResolver implementation.
 func (r *Resolver) Episode() generated.EpisodeResolver { return &episodeResolver{r} }
 
+// Language returns generated.LanguageResolver implementation.
+func (r *Resolver) Language() generated.LanguageResolver { return &languageResolver{r} }
+
 // Season returns generated.SeasonResolver implementation.
 func (r *Resolver) Season() generated.SeasonResolver { return &seasonResolver{r} }
 
@@ -194,6 +213,7 @@ func (r *Resolver) TVDBEpisode() generated.TVDBEpisodeResolver { return &tVDBEpi
 func (r *Resolver) TVDBSeries() generated.TVDBSeriesResolver { return &tVDBSeriesResolver{r} }
 
 type episodeResolver struct{ *Resolver }
+type languageResolver struct{ *Resolver }
 type seasonResolver struct{ *Resolver }
 type seriesResolver struct{ *Resolver }
 type tVDBEpisodeResolver struct{ *Resolver }
