@@ -7,10 +7,10 @@ import (
 	"context"
 
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
-	"github.com/mrobinsn/go-newznab/newznab"
+	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
 )
 
-func (r *newznabResolver) ID(ctx context.Context, obj *newznab.NZB) (*string, error) {
+func (r *newznabResolver) ID(ctx context.Context, obj *model.Newznab) (*string, error) {
 	if len(obj.ID) > 0 {
 		return &obj.ID, nil
 	}
@@ -18,12 +18,12 @@ func (r *newznabResolver) ID(ctx context.Context, obj *newznab.NZB) (*string, er
 	return &obj.Title, nil
 }
 
-func (r *newznabResolver) Imdb(ctx context.Context, obj *newznab.NZB) (*string, error) {
+func (r *newznabResolver) Imdb(ctx context.Context, obj *model.Newznab) (*string, error) {
 	var id = obj.IMDBID
 	return &id, nil
 }
 
-func (r *newznabResolver) Imdbscore(ctx context.Context, obj *newznab.NZB) (*float64, error) {
+func (r *newznabResolver) Imdbscore(ctx context.Context, obj *model.Newznab) (*float64, error) {
 	var score = float64(obj.IMDBScore)
 	return &score, nil
 }

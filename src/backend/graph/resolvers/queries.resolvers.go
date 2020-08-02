@@ -44,20 +44,22 @@ func (r *queryResolver) TvdbSeriesSearch(ctx context.Context, term string) ([]*t
 	return results, nil
 }
 
-func (r *queryResolver) NzbSearch(ctx context.Context, categories []*graphModel.NewznabCategory, term string) ([]*newznab.NZB, error) {
-	var results []*newznab.NZB
+func (r *queryResolver) NzbSearch(ctx context.Context, categories []*graphModel.NewznabCategory, term string) ([]*graphModel.Newznab, error) {
+	var results []*graphModel.Newznab
 
 	nzbResults, err := newznabClient.SearchWithQuery(convertNZBCategories(categories), term, "search")
 
 	for _, nzbResult := range nzbResults {
-		var result = nzbResult
+		var result = graphModel.Newznab{
+			NZB: nzbResult,
+		}
 		results = append(results, &result)
 	}
 
 	return results, err
 }
 
-func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*graphModel.NewznabCategory, episodeID int) ([]*newznab.NZB, error) {
+func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*graphModel.NewznabCategory, episodeID int) ([]*graphModel.Newznab, error) {
 	var cat = categories
 	if cat == nil {
 		var tvAll = graphModel.NewznabCategoryTvAll
@@ -65,7 +67,7 @@ func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*grap
 	}
 
 	var ep model.Episode
-	var results []*newznab.NZB
+	var results []*graphModel.Newznab
 
 	var err = db.DB.First(&ep, episodeID).Error
 
@@ -92,7 +94,9 @@ func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*grap
 	log.Printf("[NEWZNAB] Search '%s', %d results, error: %+v\n", searchTerm, len(temp), err)
 
 	for _, nzbResult := range temp {
-		var result = nzbResult
+		var result = graphModel.Newznab{
+			NZB: nzbResult,
+		}
 		results = append(results, &result)
 	}
 
@@ -101,7 +105,9 @@ func (r *queryResolver) NzbSearchEpisode(ctx context.Context, categories []*grap
 	log.Printf("[NEWZNAB] Search '%s', %d results, error: %+v\n", searchTerm, len(temp), err)
 
 	for _, nzbResult := range temp {
-		var result = nzbResult
+		var result = graphModel.Newznab{
+			NZB: nzbResult,
+		}
 		results = append(results, &result)
 	}
 

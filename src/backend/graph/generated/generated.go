@@ -254,18 +254,18 @@ type MutationResolver interface {
 	SeriesUpdateLanguage(ctx context.Context, input model.SeriesUpdateLanguageInput) (*model.SeriesUpdateLanguagePayload, error)
 }
 type NewznabResolver interface {
-	ID(ctx context.Context, obj *newznab.NZB) (*string, error)
+	ID(ctx context.Context, obj *model.Newznab) (*string, error)
 
-	Imdb(ctx context.Context, obj *newznab.NZB) (*string, error)
+	Imdb(ctx context.Context, obj *model.Newznab) (*string, error)
 
-	Imdbscore(ctx context.Context, obj *newznab.NZB) (*float64, error)
+	Imdbscore(ctx context.Context, obj *model.Newznab) (*float64, error)
 }
 type QueryResolver interface {
 	Series(ctx context.Context) ([]*model1.Series, error)
 	SeriesByID(ctx context.Context, id *int) (*model1.Series, error)
 	TvdbSeriesSearch(ctx context.Context, term string) ([]*tvdb.Series, error)
-	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*newznab.NZB, error)
-	NzbSearchEpisode(ctx context.Context, categories []*model.NewznabCategory, episodeID int) ([]*newznab.NZB, error)
+	NzbSearch(ctx context.Context, categories []*model.NewznabCategory, term string) ([]*model.Newznab, error)
+	NzbSearchEpisode(ctx context.Context, categories []*model.NewznabCategory, episodeID int) ([]*model.Newznab, error)
 	Languages(ctx context.Context) ([]*model1.Language, error)
 }
 type SeasonResolver interface {
@@ -2214,7 +2214,7 @@ func (ec *executionContext) _Mutation_seriesUpdateLanguage(ctx context.Context, 
 	return ec.marshalNSeriesUpdateLanguagePayload2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐSeriesUpdateLanguagePayload(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2245,7 +2245,7 @@ func (ec *executionContext) _Newznab_id(ctx context.Context, field graphql.Colle
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2276,7 +2276,7 @@ func (ec *executionContext) _Newznab_title(ctx context.Context, field graphql.Co
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_description(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_description(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2307,7 +2307,7 @@ func (ec *executionContext) _Newznab_description(ctx context.Context, field grap
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_size(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_size(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2338,7 +2338,7 @@ func (ec *executionContext) _Newznab_size(ctx context.Context, field graphql.Col
 	return ec.marshalOInt2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_air_date(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_air_date(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2369,7 +2369,7 @@ func (ec *executionContext) _Newznab_air_date(ctx context.Context, field graphql
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_pub_date(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_pub_date(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2400,7 +2400,7 @@ func (ec *executionContext) _Newznab_pub_date(ctx context.Context, field graphql
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_usenet_date(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_usenet_date(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2431,7 +2431,7 @@ func (ec *executionContext) _Newznab_usenet_date(ctx context.Context, field grap
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_num_grabs(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_num_grabs(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2462,7 +2462,7 @@ func (ec *executionContext) _Newznab_num_grabs(ctx context.Context, field graphq
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_num_comments(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_num_comments(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2493,7 +2493,7 @@ func (ec *executionContext) _Newznab_num_comments(ctx context.Context, field gra
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_comments(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_comments(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2524,7 +2524,7 @@ func (ec *executionContext) _Newznab_comments(ctx context.Context, field graphql
 	return ec.marshalONewznabComment2ᚕgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐComment(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_source_endpoint(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_source_endpoint(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2558,7 +2558,7 @@ func (ec *executionContext) _Newznab_source_endpoint(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_source_apikey(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_source_apikey(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2592,7 +2592,7 @@ func (ec *executionContext) _Newznab_source_apikey(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_category(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_category(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2623,7 +2623,7 @@ func (ec *executionContext) _Newznab_category(ctx context.Context, field graphql
 	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_info(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_info(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2654,7 +2654,7 @@ func (ec *executionContext) _Newznab_info(ctx context.Context, field graphql.Col
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_genre(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_genre(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2685,7 +2685,7 @@ func (ec *executionContext) _Newznab_genre(ctx context.Context, field graphql.Co
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_resolution(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_resolution(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2716,7 +2716,7 @@ func (ec *executionContext) _Newznab_resolution(ctx context.Context, field graph
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_tvdbid(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_tvdbid(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2747,7 +2747,7 @@ func (ec *executionContext) _Newznab_tvdbid(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_tvrageid(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_tvrageid(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2778,7 +2778,7 @@ func (ec *executionContext) _Newznab_tvrageid(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_tvmazeid(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_tvmazeid(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2809,7 +2809,7 @@ func (ec *executionContext) _Newznab_tvmazeid(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_season(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_season(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2840,7 +2840,7 @@ func (ec *executionContext) _Newznab_season(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_episode(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_episode(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2871,7 +2871,7 @@ func (ec *executionContext) _Newznab_episode(ctx context.Context, field graphql.
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_tvtitle(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_tvtitle(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2902,7 +2902,7 @@ func (ec *executionContext) _Newznab_tvtitle(ctx context.Context, field graphql.
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_rating(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_rating(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2933,7 +2933,7 @@ func (ec *executionContext) _Newznab_rating(ctx context.Context, field graphql.C
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_imdb(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_imdb(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2964,7 +2964,7 @@ func (ec *executionContext) _Newznab_imdb(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_imdbtitle(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_imdbtitle(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2995,7 +2995,7 @@ func (ec *executionContext) _Newznab_imdbtitle(ctx context.Context, field graphq
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_imdbyear(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_imdbyear(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3026,7 +3026,7 @@ func (ec *executionContext) _Newznab_imdbyear(ctx context.Context, field graphql
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_imdbscore(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_imdbscore(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3057,7 +3057,7 @@ func (ec *executionContext) _Newznab_imdbscore(ctx context.Context, field graphq
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_coverurl(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_coverurl(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3088,7 +3088,7 @@ func (ec *executionContext) _Newznab_coverurl(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_seeders(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_seeders(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3119,7 +3119,7 @@ func (ec *executionContext) _Newznab_seeders(ctx context.Context, field graphql.
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_peers(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_peers(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3150,7 +3150,7 @@ func (ec *executionContext) _Newznab_peers(ctx context.Context, field graphql.Co
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_infohash(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_infohash(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3181,7 +3181,7 @@ func (ec *executionContext) _Newznab_infohash(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_download_url(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_download_url(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3212,7 +3212,7 @@ func (ec *executionContext) _Newznab_download_url(ctx context.Context, field gra
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Newznab_is_torrent(ctx context.Context, field graphql.CollectedField, obj *newznab.NZB) (ret graphql.Marshaler) {
+func (ec *executionContext) _Newznab_is_torrent(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3488,9 +3488,9 @@ func (ec *executionContext) _Query_nzbSearch(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*newznab.NZB)
+	res := resTmp.([]*model.Newznab)
 	fc.Result = res
-	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, field.Selections, res)
+	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznab(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_nzbSearchEpisode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3529,9 +3529,9 @@ func (ec *executionContext) _Query_nzbSearchEpisode(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*newznab.NZB)
+	res := resTmp.([]*model.Newznab)
 	fc.Result = res
-	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, field.Selections, res)
+	return ec.marshalNNewznab2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznab(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_languages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7948,7 +7948,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 var newznabImplementors = []string{"Newznab"}
 
-func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, obj *newznab.NZB) graphql.Marshaler {
+func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, obj *model.Newznab) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, newznabImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -9361,7 +9361,7 @@ func (ec *executionContext) marshalNLanguage2ᚕᚖgithubᚗcomᚋbottleneckco�
 	return ret
 }
 
-func (ec *executionContext) marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v []*newznab.NZB) graphql.Marshaler {
+func (ec *executionContext) marshalNNewznab2ᚕᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznab(ctx context.Context, sel ast.SelectionSet, v []*model.Newznab) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -9385,7 +9385,7 @@ func (ec *executionContext) marshalNNewznab2ᚕᚖgithubᚗcomᚋmrobinsnᚋgo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalONewznab2ᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx, sel, v[i])
+			ret[i] = ec.marshalONewznab2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznab(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10113,11 +10113,11 @@ func (ec *executionContext) marshalOLanguage2ᚖgithubᚗcomᚋbottleneckcoᚋsh
 	return ec._Language(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalONewznab2githubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v newznab.NZB) graphql.Marshaler {
+func (ec *executionContext) marshalONewznab2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznab(ctx context.Context, sel ast.SelectionSet, v model.Newznab) graphql.Marshaler {
 	return ec._Newznab(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalONewznab2ᚖgithubᚗcomᚋmrobinsnᚋgoᚑnewznabᚋnewznabᚐNZB(ctx context.Context, sel ast.SelectionSet, v *newznab.NZB) graphql.Marshaler {
+func (ec *executionContext) marshalONewznab2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐNewznab(ctx context.Context, sel ast.SelectionSet, v *model.Newznab) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
