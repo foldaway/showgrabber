@@ -2,6 +2,15 @@
 #
 # https://gqlgen.com/getting-started/
 
+type ParsedMetadata {
+  season_number: Int
+  episode_number: Int
+  video_codec: String
+  audio_codec: String
+  resolution: String
+  scene_name: String
+}
+
 type Newznab {
   id: String 
   title: String
@@ -41,6 +50,8 @@ type Newznab {
   infohash: String
   download_url: String
   is_torrent: Boolean 
+
+  parsed: ParsedMetadata
 }
 
 enum NewznabCategory {

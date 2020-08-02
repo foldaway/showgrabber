@@ -93,6 +93,7 @@ type ComplexityRoot struct {
 		IsTorrent      func(childComplexity int) int
 		NumComments    func(childComplexity int) int
 		NumGrabs       func(childComplexity int) int
+		Parsed         func(childComplexity int) int
 		Peers          func(childComplexity int) int
 		PubDate        func(childComplexity int) int
 		Rating         func(childComplexity int) int
@@ -114,6 +115,15 @@ type ComplexityRoot struct {
 		Content func(childComplexity int) int
 		PubDate func(childComplexity int) int
 		Title   func(childComplexity int) int
+	}
+
+	ParsedMetadata struct {
+		AudioCodec    func(childComplexity int) int
+		EpisodeNumber func(childComplexity int) int
+		Resolution    func(childComplexity int) int
+		SceneName     func(childComplexity int) int
+		SeasonNumber  func(childComplexity int) int
+		VideoCodec    func(childComplexity int) int
 	}
 
 	Query struct {
@@ -259,6 +269,8 @@ type NewznabResolver interface {
 	Imdb(ctx context.Context, obj *model.Newznab) (*string, error)
 
 	Imdbscore(ctx context.Context, obj *model.Newznab) (*float64, error)
+
+	Parsed(ctx context.Context, obj *model.Newznab) (*model.ParsedMetadata, error)
 }
 type QueryResolver interface {
 	Series(ctx context.Context) ([]*model1.Series, error)
@@ -522,6 +534,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Newznab.NumGrabs(childComplexity), true
 
+	case "Newznab.parsed":
+		if e.complexity.Newznab.Parsed == nil {
+			break
+		}
+
+		return e.complexity.Newznab.Parsed(childComplexity), true
+
 	case "Newznab.peers":
 		if e.complexity.Newznab.Peers == nil {
 			break
@@ -647,6 +666,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NewznabComment.Title(childComplexity), true
+
+	case "ParsedMetadata.audio_codec":
+		if e.complexity.ParsedMetadata.AudioCodec == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.AudioCodec(childComplexity), true
+
+	case "ParsedMetadata.episode_number":
+		if e.complexity.ParsedMetadata.EpisodeNumber == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.EpisodeNumber(childComplexity), true
+
+	case "ParsedMetadata.resolution":
+		if e.complexity.ParsedMetadata.Resolution == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.Resolution(childComplexity), true
+
+	case "ParsedMetadata.scene_name":
+		if e.complexity.ParsedMetadata.SceneName == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.SceneName(childComplexity), true
+
+	case "ParsedMetadata.season_number":
+		if e.complexity.ParsedMetadata.SeasonNumber == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.SeasonNumber(childComplexity), true
+
+	case "ParsedMetadata.video_codec":
+		if e.complexity.ParsedMetadata.VideoCodec == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.VideoCodec(childComplexity), true
 
 	case "Query.languages":
 		if e.complexity.Query.Languages == nil {
@@ -1422,6 +1483,15 @@ type Mutation {
 #
 # https://gqlgen.com/getting-started/
 
+type ParsedMetadata {
+  season_number: Int
+  episode_number: Int
+  video_codec: String
+  audio_codec: String
+  resolution: String
+  scene_name: String
+}
+
 type Newznab {
   id: String 
   title: String
@@ -1461,6 +1531,8 @@ type Newznab {
   infohash: String
   download_url: String
   is_torrent: Boolean 
+
+  parsed: ParsedMetadata
 }
 
 enum NewznabCategory {
@@ -3243,6 +3315,37 @@ func (ec *executionContext) _Newznab_is_torrent(ctx context.Context, field graph
 	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Newznab_parsed(ctx context.Context, field graphql.CollectedField, obj *model.Newznab) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Newznab",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Newznab().Parsed(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ParsedMetadata)
+	fc.Result = res
+	return ec.marshalOParsedMetadata2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐParsedMetadata(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NewznabComment_title(ctx context.Context, field graphql.CollectedField, obj *newznab.Comment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3334,6 +3437,192 @@ func (ec *executionContext) _NewznabComment_pub_date(ctx context.Context, field 
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_season_number(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SeasonNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_episode_number(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EpisodeNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_video_codec(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VideoCodec, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_audio_codec(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AudioCodec, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_resolution(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resolution, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_scene_name(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SceneName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_series(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8056,6 +8345,17 @@ func (ec *executionContext) _Newznab(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Newznab_download_url(ctx, field, obj)
 		case "is_torrent":
 			out.Values[i] = ec._Newznab_is_torrent(ctx, field, obj)
+		case "parsed":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Newznab_parsed(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8084,6 +8384,40 @@ func (ec *executionContext) _NewznabComment(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._NewznabComment_content(ctx, field, obj)
 		case "pub_date":
 			out.Values[i] = ec._NewznabComment_pub_date(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var parsedMetadataImplementors = []string{"ParsedMetadata"}
+
+func (ec *executionContext) _ParsedMetadata(ctx context.Context, sel ast.SelectionSet, obj *model.ParsedMetadata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, parsedMetadataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ParsedMetadata")
+		case "season_number":
+			out.Values[i] = ec._ParsedMetadata_season_number(ctx, field, obj)
+		case "episode_number":
+			out.Values[i] = ec._ParsedMetadata_episode_number(ctx, field, obj)
+		case "video_codec":
+			out.Values[i] = ec._ParsedMetadata_video_codec(ctx, field, obj)
+		case "audio_codec":
+			out.Values[i] = ec._ParsedMetadata_audio_codec(ctx, field, obj)
+		case "resolution":
+			out.Values[i] = ec._ParsedMetadata_resolution(ctx, field, obj)
+		case "scene_name":
+			out.Values[i] = ec._ParsedMetadata_scene_name(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10250,6 +10584,17 @@ func (ec *executionContext) marshalONewznabComment2ᚕgithubᚗcomᚋmrobinsnᚋ
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOParsedMetadata2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐParsedMetadata(ctx context.Context, sel ast.SelectionSet, v model.ParsedMetadata) graphql.Marshaler {
+	return ec._ParsedMetadata(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOParsedMetadata2ᚖgithubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋgraphᚋmodelᚐParsedMetadata(ctx context.Context, sel ast.SelectionSet, v *model.ParsedMetadata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ParsedMetadata(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOSeason2githubᚗcomᚋbottleneckcoᚋshowgrabberᚋsrcᚋbackendᚋmodelᚐSeason(ctx context.Context, sel ast.SelectionSet, v model1.Season) graphql.Marshaler {

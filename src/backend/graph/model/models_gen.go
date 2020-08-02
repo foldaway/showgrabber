@@ -10,6 +10,15 @@ import (
 	"github.com/bottleneckco/showgrabber/src/backend/model"
 )
 
+type ParsedMetadata struct {
+	SeasonNumber  *int    `json:"season_number"`
+	EpisodeNumber *int    `json:"episode_number"`
+	VideoCodec    *string `json:"video_codec"`
+	AudioCodec    *string `json:"audio_codec"`
+	Resolution    *string `json:"resolution"`
+	SceneName     *string `json:"scene_name"`
+}
+
 type SeriesAddInput struct {
 	TvdbID int `json:"tvdbID"`
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/bottleneckco/showgrabber/src/backend/graph/generated"
 	"github.com/bottleneckco/showgrabber/src/backend/graph/model"
+	"github.com/bottleneckco/showgrabber/src/backend/util"
 )
 
 func (r *newznabResolver) ID(ctx context.Context, obj *model.Newznab) (*string, error) {
@@ -26,6 +27,10 @@ func (r *newznabResolver) Imdb(ctx context.Context, obj *model.Newznab) (*string
 func (r *newznabResolver) Imdbscore(ctx context.Context, obj *model.Newznab) (*float64, error) {
 	var score = float64(obj.IMDBScore)
 	return &score, nil
+}
+
+func (r *newznabResolver) Parsed(ctx context.Context, obj *model.Newznab) (*model.ParsedMetadata, error) {
+	return util.ParseNewznab(obj.Title)
 }
 
 // Newznab returns generated.NewznabResolver implementation.
