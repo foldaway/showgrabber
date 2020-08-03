@@ -38,7 +38,7 @@ func ParseNewznab(title string) (*model.ParsedMetadata, error) {
 		isResultAvailable = true
 	}
 
-	var resolutionLiteralRegex = regexp.MustCompile(`(\d+)x(\d+)`)
+	var resolutionLiteralRegex = regexp.MustCompile(`(\d{3,4})x(\d{3,4})`)
 	var resolutionLiteralRaw = resolutionLiteralRegex.FindStringSubmatch(title)
 
 	if len(resolutionLiteralRaw) > 0 {
