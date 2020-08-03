@@ -9,6 +9,7 @@ type ParsedMetadata {
   audio_codec: String
   resolution: String
   scene_name: String
+  release_format: String
 }
 
 type Newznab {

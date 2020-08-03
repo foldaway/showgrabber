@@ -120,6 +120,7 @@ type ComplexityRoot struct {
 	ParsedMetadata struct {
 		AudioCodec    func(childComplexity int) int
 		EpisodeNumber func(childComplexity int) int
+		ReleaseFormat func(childComplexity int) int
 		Resolution    func(childComplexity int) int
 		SceneName     func(childComplexity int) int
 		SeasonNumber  func(childComplexity int) int
@@ -680,6 +681,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ParsedMetadata.EpisodeNumber(childComplexity), true
+
+	case "ParsedMetadata.release_format":
+		if e.complexity.ParsedMetadata.ReleaseFormat == nil {
+			break
+		}
+
+		return e.complexity.ParsedMetadata.ReleaseFormat(childComplexity), true
 
 	case "ParsedMetadata.resolution":
 		if e.complexity.ParsedMetadata.Resolution == nil {
@@ -1490,6 +1498,7 @@ type ParsedMetadata {
   audio_codec: String
   resolution: String
   scene_name: String
+  release_format: String
 }
 
 type Newznab {
@@ -3612,6 +3621,37 @@ func (ec *executionContext) _ParsedMetadata_scene_name(ctx context.Context, fiel
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SceneName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ParsedMetadata_release_format(ctx context.Context, field graphql.CollectedField, obj *model.ParsedMetadata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ParsedMetadata",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReleaseFormat, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8418,6 +8458,8 @@ func (ec *executionContext) _ParsedMetadata(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._ParsedMetadata_resolution(ctx, field, obj)
 		case "scene_name":
 			out.Values[i] = ec._ParsedMetadata_scene_name(ctx, field, obj)
+		case "release_format":
+			out.Values[i] = ec._ParsedMetadata_release_format(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

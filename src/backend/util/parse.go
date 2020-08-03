@@ -80,6 +80,15 @@ func ParseNewznab(title string) (*model.ParsedMetadata, error) {
 		isResultAvailable = true
 	}
 
+	var releaseFormatRegex = regexp.MustCompile(`(?i)(WEBDL|WEBRip|WEB|HDTV|Xvid)`)
+	var releaseFormatRaw = releaseFormatRegex.FindStringSubmatch(strings.ReplaceAll(title, "-", ""))
+
+	if len(releaseFormatRaw) > 0 {
+		var format = strings.ToUpper(releaseFormatRaw[1])
+		result.ReleaseFormat = &format
+		isResultAvailable = true
+	}
+
 	if !isResultAvailable {
 		return nil, err
 	}

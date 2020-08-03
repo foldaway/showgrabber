@@ -17,6 +17,7 @@ type ParsedMetadata struct {
 	AudioCodec    *string `json:"audio_codec"`
 	Resolution    *string `json:"resolution"`
 	SceneName     *string `json:"scene_name"`
+	ReleaseFormat *string `json:"release_format"`
 }
 
 type SeriesAddInput struct {
