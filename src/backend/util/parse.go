@@ -63,6 +63,14 @@ func ParseNewznab(title string) (*model.ParsedMetadata, error) {
 		var vCodec = videoCodecRaw[1]
 		result.VideoCodec = &vCodec
 		isResultAvailable = true
+
+		var sceneNameRegex = regexp.MustCompile(fmt.Sprintf("(?i)%s-(\\w+)", vCodec))
+		var sceneNameRaw = sceneNameRegex.FindStringSubmatch(title)
+
+		if len(sceneNameRaw) > 0 {
+			var sceneName = sceneNameRaw[1]
+			result.SceneName = &sceneName
+		}
 	}
 
 	if strings.Contains(title, "HEVC") {
