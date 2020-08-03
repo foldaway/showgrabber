@@ -6,7 +6,7 @@ import { formatBytes } from '../util/formatBytes';
 const Wrapper = styled.div`
   display: grid;
   grid-template-areas: 'title size metadata seeders peers';
-  grid-template-columns: 5fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 5fr 1fr 2fr 1fr 1fr;
   align-items: center;
 `;
 
@@ -48,6 +48,20 @@ const VideoCodec = styled.span`
   padding: 3px 4px;
 `;
 
+const SceneName = styled.span`
+  background-color: #d895b4;
+  font-family: monospace;
+  border-radius: 8px;
+  padding: 3px 4px;
+`;
+
+const ReleaseFormat = styled.span`
+  background-color: #d8ae82;
+  font-family: monospace;
+  border-radius: 8px;
+  padding: 3px 4px;
+`;
+
 interface Props {
   newznab: GraphQLTypes.Newznab;
 }
@@ -65,6 +79,12 @@ const Newznab: React.FC<Props> = function (props) {
         )}
         {newznab.parsed?.video_codec && (
           <VideoCodec>{newznab.parsed?.video_codec}</VideoCodec>
+        )}
+        {newznab.parsed?.scene_name && (
+          <SceneName>{newznab.parsed?.scene_name}</SceneName>
+        )}
+        {newznab.parsed?.release_format && (
+          <ReleaseFormat>{newznab.parsed?.release_format}</ReleaseFormat>
         )}
       </Metadata>
       <Seeders>{newznab.seeders}</Seeders>

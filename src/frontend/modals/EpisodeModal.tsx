@@ -30,6 +30,7 @@ const NEWZNAB_SEARCH = gql`
         audio_codec
         resolution
         scene_name
+        release_format
       }
     }
   }
