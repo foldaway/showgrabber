@@ -54,6 +54,14 @@ func ParseNewznab(title string) (*model.ParsedMetadata, error) {
 		var res = resolutionHDTVRaw[1]
 		result.Resolution = &res
 		isResultAvailable = true
+
+		var sceneNameRegex = regexp.MustCompile(fmt.Sprintf("(?i)%s-(\\w+)", res))
+		var sceneNameRaw = sceneNameRegex.FindStringSubmatch(title)
+
+		if len(sceneNameRaw) > 0 {
+			var sceneName = sceneNameRaw[1]
+			result.SceneName = &sceneName
+		}
 	}
 
 	var videoCodecRegex = regexp.MustCompile(`(?i)(?:h|x)?((?:264|265)|xvid)`)
@@ -86,6 +94,14 @@ func ParseNewznab(title string) (*model.ParsedMetadata, error) {
 		var aCodec = audioCodecRaw[1]
 		result.AudioCodec = &aCodec
 		isResultAvailable = true
+
+		var sceneNameRegex = regexp.MustCompile(fmt.Sprintf("(?i)%s-(\\w+)", aCodec))
+		var sceneNameRaw = sceneNameRegex.FindStringSubmatch(title)
+
+		if len(sceneNameRaw) > 0 {
+			var sceneName = sceneNameRaw[1]
+			result.SceneName = &sceneName
+		}
 	}
 
 	var releaseFormatRegex = regexp.MustCompile(`(?i)(WEBDL|WEBRip|WEB|HDTV|Xvid)`)
