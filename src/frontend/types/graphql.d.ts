@@ -84,6 +84,7 @@ namespace GraphQLTypes {
     audio_codec?: string;
     resolution?: string;
     scene_name?: string;
+    release_format?: string;
   }
 
   export interface NewznabComment {
